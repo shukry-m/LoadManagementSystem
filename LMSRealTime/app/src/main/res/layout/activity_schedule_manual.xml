@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:background="@drawable/walpaper"
+    android:orientation="vertical"
+    android:layout_height="match_parent"
+    tools:context=".view.ScheduleManualActivity">
+
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/btnCooking"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="200dp"
+        android:background="@drawable/button_click"
+        android:layout_marginRight="10dp"
+        android:fontFamily="@font/aclonica"
+        android:padding="12dp"
+        android:text="Cooking Appliance" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/btnFlexible"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="100dp"
+        android:layout_marginRight="10dp"
+        android:background="@drawable/button_click"
+        android:fontFamily="@font/aclonica"
+        android:padding="12dp"
+        android:text="Flexible loads" />
+</LinearLayout>

@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "190342445590",
+    "firebase_url": "https://loadmanagementapp.firebaseio.com",
+    "project_id": "loadmanagementapp",
+    "storage_bucket": "loadmanagementapp.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:190342445590:android:e31258c566a19cc85ed337",
+        "android_client_info": {
+          "package_name": "lk.iot.lmsrealtime1"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "190342445590-c4encies08pv91dl4cu18vkk56tjg1lc.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBaf_lJB0W-mszMY7vXoFhUeUZJ3JY2c5o"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "190342445590-c4encies08pv91dl4cu18vkk56tjg1lc.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

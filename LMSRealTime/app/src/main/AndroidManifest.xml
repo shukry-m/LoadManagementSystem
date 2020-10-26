@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="lk.iot.lmsrealtime1">
+
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
+    <application
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher_lm_sq"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_lm"
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme"
+        android:usesCleartextTraffic="true">
+        <activity android:name=".view.ScheduleManualFlexibleLoadsActivity"></activity>
+        <activity android:name=".view.ScheduleManualCookingActivity" />
+        <activity android:name=".view.Category3Activity" />
+        <activity android:name=".view.Category2Activity" />
+        <activity android:name=".view.Category1Activity" />
+        <activity android:name=".view.ScheduleAutomaticActivity" />
+        <activity android:name=".view.ScheduleManualActivity" />
+        <activity android:name=".view.RegisterActivity" />
+        <activity
+            android:name=".view.SplashActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.Fullscreen.Splash">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".view.HomeApplianceActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".view.ScheduleActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".view.ManualControlActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".view.CostAndPower"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".view.CustomerInfo"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".view.LoginActivity"
+            android:screenOrientation="portrait">
+
+            <!-- <intent-filter> -->
+            <!-- <action android:name="android.intent.action.MAIN" /> -->
+
+
+            <!-- <category android:name="android.intent.category.LAUNCHER" /> -->
+            <!-- </intent-filter> -->
+        </activity>
+        <activity
+            android:name=".view.MainActivity"
+            android:screenOrientation="portrait">
+
+            <!-- <intent-filter> -->
+            <!-- <action android:name="android.intent.action.MAIN" /> -->
+
+
+            <!-- <category android:name="android.intent.category.LAUNCHER" /> -->
+            <!-- </intent-filter> -->
+        </activity>
+    </application>
+
+</manifest>

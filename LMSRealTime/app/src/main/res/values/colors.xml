@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!--<color name="colorPrimary">#008577</color>-->
+    <!--<color name="colorPrimaryDark">#00574B</color>-->
+    <!--<color name="colorAccent">#038B7D</color>-->
+
+    <color name="colorPrimary">#008577</color>
+    <color name="colorPrimaryDark">#00574B</color>
+    <color name="colorAccent">#D81B60</color>
+
+    <color name="black" tools:ignore="MissingDefaultResource">#000000</color>
+
+    <color name="background_color">@android:color/transparent</color>
+
+    <color name="border">#03302A</color>
+    <color name="inside">#9CCFCB</color>
+
+    <color name="background_screen1">#ffe6e5</color>
+    <color name="background_screen2">#cf8989</color>
+
+    <color name="background_editText">#646464</color>
+
+    <color name="text_color_1">#000000</color>
+    <color name="text_color_2">#ffffff</color>
+    <color name="text_color_3">#7e1d1a</color>
+
+    <color name="button_color_0">#8bdac9</color>
+    <color name="button_color_1">#029789</color>
+    <color name="button_color_2">#027a6c</color>
+    <color name="button_color_3">#4D6966</color>
+    <color name="item_background">#38753B</color>
+
+    <color name="disablecolor">#a69b9b</color>
+
+    <color name="clicked_red">#91C2F7</color>
+    <color name="red">#FF0000</color>
+
+    <color name="blue">#0048FF</color>
+
+    <color name="green">#9dd973</color>
+    <color name="green_okay">#367C07</color>
+    <color name="green_okay_light">#4CAF08</color>
+    <color name="green_dark">#87ba62</color>
+
+    <color name="disabled_color">#c2bbbb</color>
+    <color name="enabled_color">#ffffff</color>
+
+    <color name="cardViewBackground">#142126</color>
+    <color name="cardViewNotSelectBackground">#2b4854</color>
+
+    <color name="leave_back">#141111</color>
+    <color name="leave_back2">#3E5544</color>
+    <color name="backround_gray">#94CABFBF</color>
+
+    <color name="gray">#808080</color>
+
+    <color name="warningColor">#FFA500</color>
+    <color name="successColor">#a4c639</color>
+    <color name="errorColor">#CC0000</color>
+    <color name="textGray">#808080</color>
+</resources>
