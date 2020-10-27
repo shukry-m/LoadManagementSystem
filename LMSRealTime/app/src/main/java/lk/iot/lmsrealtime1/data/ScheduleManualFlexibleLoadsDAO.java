@@ -62,12 +62,13 @@ public class ScheduleManualFlexibleLoadsDAO {
 
             Cursor cur_s = dB.rawQuery(select, null);
 
-            if (cur_s.getCount() == 0) {
+            if (cur_s.getCount() == 0 && !scheduleManual.getS_LABEL().equalsIgnoreCase("iron")) {
                 //insertCategory1
                 ContentValues values = new ContentValues();
 
                 values.put(dbHelper.F_LABEL, scheduleManual.getS_LABEL());
                 values.put(dbHelper.F_USER_ID, scheduleManual.getS_USER_ID());
+                values.put(dbHelper.F_CATEGORY_ID, scheduleManual.getS_Category_Id());
                 values.put(dbHelper.F_Start_Time_Hour,scheduleManual.getS_Start_Time_Hour());
                 values.put(dbHelper.F_Start_Time_Minute,scheduleManual.getS_Start_Time_Minute());
                 values.put(dbHelper.F_End_Time_Hour,scheduleManual.getS_End_Time_Hour());
@@ -79,12 +80,13 @@ public class ScheduleManualFlexibleLoadsDAO {
                 if(count>0){
                     System.out.println("* inserted "+count);
                 }
-            }else{
+            }else if (cur_s.getCount() >0){
                 //update
                 ContentValues values = new ContentValues();
 
                 values.put(dbHelper.F_LABEL, scheduleManual.getS_LABEL());
                 values.put(dbHelper.F_USER_ID, scheduleManual.getS_USER_ID());
+                values.put(dbHelper.F_CATEGORY_ID, scheduleManual.getS_Category_Id());
                 values.put(dbHelper.F_Start_Time_Hour,scheduleManual.getS_Start_Time_Hour());
                 values.put(dbHelper.F_Start_Time_Minute,scheduleManual.getS_Start_Time_Minute());
                 values.put(dbHelper.F_End_Time_Hour,scheduleManual.getS_End_Time_Hour());
@@ -111,7 +113,7 @@ public class ScheduleManualFlexibleLoadsDAO {
 
 
     // insert new label
-    public int insert(String userId,String label) {
+    public int insert(String category_id,String userId,String label) {
         int count =0;
 
         System.out.println(userId +": "+ label);
@@ -130,12 +132,13 @@ public class ScheduleManualFlexibleLoadsDAO {
 
             Cursor cur_s = dB.rawQuery(select, null);
 
-            if (cur_s.getCount() == 0) {
+            if (cur_s.getCount() == 0 && !label.equalsIgnoreCase("iron")) {
                 //insert new Category1
                 ContentValues values = new ContentValues();
 
                 values.put(dbHelper.F_LABEL, label);
                 values.put(dbHelper.F_USER_ID, userId);
+                values.put(dbHelper.F_CATEGORY_ID, category_id);
                 values.put(dbHelper.F_Start_Time_Hour,"00");
                 values.put(dbHelper.F_Start_Time_Minute,"00");
                 values.put(dbHelper.F_End_Time_Hour,"00");
@@ -172,7 +175,7 @@ public class ScheduleManualFlexibleLoadsDAO {
 
 
 
-    void insertNewLabel(String label, String status, String userID){
+  /*  void insertNewLabel(String label, String status, String userID){
 
         try{
             if(status.equalsIgnoreCase("yes")){
@@ -185,11 +188,53 @@ public class ScheduleManualFlexibleLoadsDAO {
             e.printStackTrace();
         }
 
-    }
+    }*/
 
 
 
     //##################### GET ####################
+
+    public ScheduleManual getFromLabel(String userID,String label){
+
+        ScheduleManual h = new ScheduleManual();
+
+        if(dB == null){
+            open();
+        }else if(!dB.isOpen()){
+            open();
+        }
+
+        try{
+
+            String select = "SELECT * FROM " + dbHelper.TABLE_SCHEDULE_MANUAL_FLEXIBLE_LOADS +" WHERE "+dbHelper.F_USER_ID+" = '"+userID+
+                    "' AND "+dbHelper.F_LABEL+" = '"+label+"'";
+
+            Log.v("Query",select);
+
+            Cursor cur = dB.rawQuery(select, null);
+
+            while (cur.moveToNext()) {
+
+                h.setS_ID(cur.getInt(cur.getColumnIndex(dbHelper.F_ID)));
+                h.setS_LABEL(cur.getString(cur.getColumnIndex(dbHelper.F_LABEL)));
+                h.setS_USER_ID(cur.getString(cur.getColumnIndex(dbHelper.F_USER_ID)));
+                h.setS_Category_Id(cur.getString(cur.getColumnIndex(dbHelper.F_CATEGORY_ID)));
+                h.setS_Start_Time_Hour(cur.getString(cur.getColumnIndex(dbHelper.F_Start_Time_Hour)));
+                h.setS_Start_Time_Minute(cur.getString(cur.getColumnIndex(dbHelper.F_Start_Time_Minute)));
+                h.setS_End_Time_Hour(cur.getString(cur.getColumnIndex(dbHelper.F_End_Time_Hour)));
+                h.setS_End_Time_Minute(cur.getString(cur.getColumnIndex(dbHelper.F_End_Time_Minute)));
+
+            }
+
+        }catch (Exception e) {
+            e.printStackTrace();
+        }finally {
+            dB.close();
+        }
+
+        return h;
+    }
+
         public ArrayList<ScheduleManual> getAll(String userID){
 
         ArrayList<ScheduleManual> list = new ArrayList<>();
@@ -214,6 +259,50 @@ public class ScheduleManualFlexibleLoadsDAO {
                 h.setS_ID(cur.getInt(cur.getColumnIndex(dbHelper.F_ID)));
                 h.setS_LABEL(cur.getString(cur.getColumnIndex(dbHelper.F_LABEL)));
                 h.setS_USER_ID(cur.getString(cur.getColumnIndex(dbHelper.F_USER_ID)));
+                h.setS_Category_Id(cur.getString(cur.getColumnIndex(dbHelper.F_CATEGORY_ID)));
+                h.setS_Start_Time_Hour(cur.getString(cur.getColumnIndex(dbHelper.F_Start_Time_Hour)));
+                h.setS_Start_Time_Minute(cur.getString(cur.getColumnIndex(dbHelper.F_Start_Time_Minute)));
+                h.setS_End_Time_Hour(cur.getString(cur.getColumnIndex(dbHelper.F_End_Time_Hour)));
+                h.setS_End_Time_Minute(cur.getString(cur.getColumnIndex(dbHelper.F_End_Time_Minute)));
+
+                list.add(h);
+            }
+
+        }catch (Exception e) {
+           e.printStackTrace();
+        }finally {
+            dB.close();
+        }
+
+        return list;
+    }
+
+
+    public ArrayList<ScheduleManual> getAllCategory(String userID,String category_id){
+
+        ArrayList<ScheduleManual> list = new ArrayList<>();
+
+        if(dB == null){
+            open();
+        }else if(!dB.isOpen()){
+            open();
+        }
+
+        try{
+
+            String select = "SELECT * FROM " + dbHelper.TABLE_SCHEDULE_MANUAL_FLEXIBLE_LOADS +" WHERE "+dbHelper.F_USER_ID+" = '"+userID+
+                    "' ORDER BY "+dbHelper.F_CATEGORY_ID+"= '"+category_id+"'";
+
+            Log.v("Query",select);
+
+            Cursor cur = dB.rawQuery(select, null);
+
+            while (cur.moveToNext()) {
+                ScheduleManual h = new ScheduleManual();
+                h.setS_ID(cur.getInt(cur.getColumnIndex(dbHelper.F_ID)));
+                h.setS_LABEL(cur.getString(cur.getColumnIndex(dbHelper.F_LABEL)));
+                h.setS_USER_ID(cur.getString(cur.getColumnIndex(dbHelper.F_USER_ID)));
+                h.setS_Category_Id(cur.getString(cur.getColumnIndex(dbHelper.F_CATEGORY_ID)));
                 h.setS_Start_Time_Hour(cur.getString(cur.getColumnIndex(dbHelper.F_Start_Time_Hour)));
                 h.setS_Start_Time_Minute(cur.getString(cur.getColumnIndex(dbHelper.F_Start_Time_Minute)));
                 h.setS_End_Time_Hour(cur.getString(cur.getColumnIndex(dbHelper.F_End_Time_Hour)));
@@ -286,6 +375,43 @@ public class ScheduleManualFlexibleLoadsDAO {
 
             String deleteQuery = "DELETE FROM "+dbHelper.TABLE_SCHEDULE_MANUAL_FLEXIBLE_LOADS
                     +" WHERE "+dbHelper.F_USER_ID +" = '"+userID+"' AND "+dbHelper.F_LABEL+" = '"+label+"'";
+
+            System.out.println("* delete query "+deleteQuery);
+
+            Cursor cur = dB.rawQuery(deleteQuery, null);
+
+            count = cur.getCount();
+            if(count>0){
+                System.out.println("Deleted ");
+            }
+
+        } catch (Exception e) {
+
+            Log.v(" Exception", e.toString());
+
+        } finally {
+            if (cursor !=null) {
+                cursor.close();
+            }
+            dB.close();
+        }
+        return count;
+
+    }
+    public  int deleteAllCategory(String userID,String category_id){
+        int count = 0;
+
+        if(dB == null){
+            open();
+        }else if(!dB.isOpen()){
+            open();
+        }
+        Cursor cursor = null;
+
+        try{
+
+            String deleteQuery = "DELETE FROM "+dbHelper.TABLE_SCHEDULE_MANUAL_FLEXIBLE_LOADS
+                    +" WHERE "+dbHelper.F_USER_ID +" = '"+userID+"' AND "+dbHelper.F_CATEGORY_ID+" = '"+category_id+"'";
 
             System.out.println("* delete query "+deleteQuery);
 

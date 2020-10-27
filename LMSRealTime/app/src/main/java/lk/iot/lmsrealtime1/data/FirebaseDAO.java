@@ -82,8 +82,8 @@ public class FirebaseDAO {
                             System.out.println(homeAppliance);
                             new Category1HomeApplianceDAO(context).insert(homeAppliance);
                             //insert new manualcontrol label with id 0
-                            new ManualControlDAO(context).insertNewLabel(
-                                    homeAppliance.getC_ID(),homeAppliance.getC_LABEL(),homeAppliance.getC_Count()+"",userId);
+//                            new ManualControlDAO(context).insertNewLabel(
+//                                    homeAppliance.getC_ID(),homeAppliance.getC_LABEL(),homeAppliance.getC_Count()+"",userId);
 
                             break;
                         }
@@ -92,10 +92,10 @@ public class FirebaseDAO {
                             System.out.println(homeAppliance);
                             new Category2HomeApplianceDAO(context).insert(homeAppliance);
                             //insert manualcontrol with id 0
-                            new ManualControlDAO(context).insertNewLabel(
-                                    homeAppliance.getC2_ID(),homeAppliance.getC2_LABEL(),homeAppliance.getC2_STATUS(),userId);
-
-                            new ScheduleManualCookingDAO(context).insertNewLabel(homeAppliance.getC2_LABEL(),homeAppliance.getC2_STATUS(),userId);
+//                            new ManualControlDAO(context).insertNewLabel(
+//                                    homeAppliance.getC2_ID(),homeAppliance.getC2_LABEL(),homeAppliance.getC2_STATUS(),userId);
+//
+//                            new ScheduleManualCookingDAO(context).insertNewLabel(homeAppliance.getC2_LABEL(),homeAppliance.getC2_STATUS(),userId);
 
                             break;
                         }
@@ -105,7 +105,7 @@ public class FirebaseDAO {
                             try {
                                 new Category3HomeApplianceDAO(context).insert(homeAppliance);
                                 //insert manualcontrol with id 0
-                                new ManualControlDAO(context).insertNewLabel(
+                               /* new ManualControlDAO(context).insertNewLabel(
                                         homeAppliance.getC3_ID(), homeAppliance.getC3_LABEL(), homeAppliance.getC3_STATUS_OR_COUNT(), userId);
 
                                 new AutomaticScheduleDAO(context).insertNewLabel(
@@ -113,6 +113,7 @@ public class FirebaseDAO {
 
                                 new ScheduleManualFlexibleLoadsDAO(context).insertNewLabel(
                                         homeAppliance.getC3_LABEL(), homeAppliance.getC3_STATUS_OR_COUNT(), userId);
+                                */
                             }catch (Exception e){
                                 System.out.println("* error in category3 insert to local db "+e.getMessage());
                             }

@@ -20,7 +20,12 @@ import java.util.ArrayList;
 import lk.iot.lmsrealtime1.R;
 import lk.iot.lmsrealtime1.data.Category2HomeApplianceDAO;
 import lk.iot.lmsrealtime1.data.FirebaseDAO;
+import lk.iot.lmsrealtime1.data.ManualControlDAO;
+import lk.iot.lmsrealtime1.data.ScheduleManualCookingDAO;
 import lk.iot.lmsrealtime1.model.Category2HomeAppliance;
+import lk.iot.lmsrealtime1.model.Category3HomeAppliance;
+import lk.iot.lmsrealtime1.model.ManualControl;
+import lk.iot.lmsrealtime1.model.ScheduleManual;
 
 public class Category2Activity extends AppCompatActivity {
 
@@ -86,9 +91,6 @@ public class Category2Activity extends AppCompatActivity {
                 list.add(new Category2HomeAppliance("C2_8",userId,"Hand Mixture", HandMixture_switch.getText().toString()));
                 list.add(new Category2HomeAppliance("C2_9",userId,"Sandwich Toaster", SandwichToaster_switch.getText().toString()));
 
-                for(Category2HomeAppliance c : list){
-                    System.out.println(" **** "+c);
-                }
 
                 final int count = new Category2HomeApplianceDAO(Category2Activity.this).insert(list);
 
@@ -97,14 +99,40 @@ public class Category2Activity extends AppCompatActivity {
 
                 new FirebaseDAO(Category2Activity.this).getCategory("category2");
 
-                //timout 100
+                for(Category2HomeAppliance  category2 : list){
+                    ArrayList<ManualControl> AllCategoryList = new ManualControlDAO(Category2Activity.this).getAllCategory(category2.getC2_ID(),userId);
+                    if(category2.getC2_STATUS().equalsIgnoreCase("yes")){
+
+                        new ManualControlDAO(Category2Activity.this).insert(category2.getC2_ID(),userId,category2.getC2_LABEL());
+                        new ScheduleManualCookingDAO(Category2Activity.this).insert(category2.getC2_ID(),userId,category2.getC2_LABEL());
+                    }else{
+                        //remove all categories
+                        if(AllCategoryList.size()>0) {
+                            new ManualControlDAO(Category2Activity.this).deleteAllCategory(category2.getC2_ID(), userId);
+                            for(ManualControl m : AllCategoryList){
+                                String path = "users/" + userId + "/manualControl";
+                                new FirebaseDAO(Category2Activity.this).deleteFromFirebase(path,m.getM_ID());
+                            }
+                        }
+                        ScheduleManual scheduleManual = new ScheduleManualCookingDAO(Category2Activity.this).getFromLabel(userId,category2.getC2_LABEL());
+                        if(scheduleManual != null){
+                            //delete from local db
+                            new ScheduleManualCookingDAO(Category2Activity.this).delete(userId,category2.getC2_LABEL());
+                            String path = "users/" + userId + "/ScheduleCooking";
+                            new FirebaseDAO(Category2Activity.this).deleteFromFirebase(path,scheduleManual.getS_ID()+"");
+                        }
+
+                    }
+                }
+
+                //timout
                 new Handler().postDelayed(new Runnable() {
                     public void run() {
                         progressBar.setVisibility(View.GONE);
                         Toast.makeText(Category2Activity.this,count+ " Records Inserted ",Toast.LENGTH_LONG).show();
                         startActivity(new Intent(getApplicationContext(),HomeApplianceActivity.class));
                     }
-                }, 5600);
+                }, 6600);
 
 
 

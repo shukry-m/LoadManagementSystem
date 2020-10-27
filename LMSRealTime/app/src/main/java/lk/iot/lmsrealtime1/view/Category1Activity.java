@@ -18,7 +18,9 @@ import java.util.ArrayList;
 import lk.iot.lmsrealtime1.R;
 import lk.iot.lmsrealtime1.data.Category1HomeApplianceDAO;
 import lk.iot.lmsrealtime1.data.FirebaseDAO;
+import lk.iot.lmsrealtime1.data.ManualControlDAO;
 import lk.iot.lmsrealtime1.model.Category1HomeAppliance;
+import lk.iot.lmsrealtime1.model.ManualControl;
 
 public class Category1Activity extends AppCompatActivity {
 
@@ -74,6 +76,41 @@ public class Category1Activity extends AppCompatActivity {
         new FirebaseDAO(Category1Activity.this).insertCategory1(list);
 
         new FirebaseDAO(Category1Activity.this).getCategory("category1");
+
+        for(Category1HomeAppliance  category1 : list){
+            ArrayList<ManualControl> AllCategoryList = new ManualControlDAO(Category1Activity.this).getAllCategory(category1.getC_ID(),userId);
+            if(category1.getC_Count() > 0){
+
+                //if count is different
+
+                if(AllCategoryList.size() > category1.getC_Count()){
+                    //remove last
+                    int diff = AllCategoryList.size() - category1.getC_Count(); //3-1 = 2
+                    for(int i=0;i<diff;i++){
+                        String path = "users/" + userId + "/manualControl";
+
+                        new ManualControlDAO(Category1Activity.this).deletelabel(category1.getC_LABEL()+" "+(AllCategoryList.size()-i),userId);
+
+                        new FirebaseDAO(Category1Activity.this).deleteFromFirebase(path,AllCategoryList.get(AllCategoryList.size()-i-1).getM_ID());
+                    }
+                }else{
+                    //insert new
+                    for(int i=0;i<category1.getC_Count() ; i++){
+                        new ManualControlDAO(Category1Activity.this).insert(category1.getC_ID(),userId,category1.getC_LABEL()+" "+(i+1));
+                    }
+                }
+            }else{
+                //remove all categories
+                if(AllCategoryList.size()>0) {
+                    new ManualControlDAO(Category1Activity.this).deleteAllCategory(category1.getC_ID(), userId);
+                    for(ManualControl m : AllCategoryList){
+                        String path = "users/" + userId + "/manualControl";
+                        new FirebaseDAO(Category1Activity.this).deleteFromFirebase(path,m.getM_ID());
+                    }
+
+                }
+            }
+        }
 
 
         new Handler().postDelayed(new Runnable() {

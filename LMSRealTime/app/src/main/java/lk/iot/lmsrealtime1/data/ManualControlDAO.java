@@ -234,6 +234,45 @@ public class ManualControlDAO {
 
     }
 
+   public ArrayList<ManualControl> getAllCategory(String c_id,String userID){
+
+        ArrayList<ManualControl> list = new ArrayList<>();
+
+        if(dB == null){
+            open();
+        }else if(!dB.isOpen()){
+            open();
+        }
+
+        try{
+
+            String select = "SELECT * FROM " + dbHelper.TABLE_MANUAL_CONTROL +" WHERE "+dbHelper.M_USER_ID+" = '"+userID+
+                    "'AND "+dbHelper.M_CATEGORY_ID+" = '"+c_id+"'";
+
+            Log.v("Query",select);
+
+            Cursor cur = dB.rawQuery(select, null);
+
+            while (cur.moveToNext()) {
+                ManualControl h = new ManualControl();
+                h.setM_ID(cur.getString(cur.getColumnIndex(dbHelper.M_ID)));
+                h.setM_LABEL(cur.getString(cur.getColumnIndex(dbHelper.M_LABEL)));
+                h.setM_USER_ID(cur.getString(cur.getColumnIndex(dbHelper.M_USER_ID)));
+                h.setM_STATUS(cur.getString(cur.getColumnIndex(dbHelper.M_STATUS)));
+                h.setM_CATEGORY_ID(cur.getString(cur.getColumnIndex(dbHelper.M_CATEGORY_ID)));
+                list.add(h);
+            }
+
+        }catch (Exception e) {
+           e.printStackTrace();
+        }finally {
+            dB.close();
+        }
+
+        return list;
+
+    }
+
     public ManualControl get(String h_id, String userID){
 
 
@@ -314,7 +353,7 @@ public class ManualControlDAO {
 
 
 
-    public int deleteHomeAppliance(String h_id,String userID) {
+    public int delete(String h_id,String userID) {
 
         int count =0;
         if(dB == null){
@@ -328,6 +367,81 @@ public class ManualControlDAO {
 
             String deleteQuery = "DELETE FROM "+dbHelper.TABLE_MANUAL_CONTROL
                     +" WHERE "+dbHelper.M_ID +" = '"+h_id+"' AND "+dbHelper.M_USER_ID +" = '"+userID+"'";
+
+            System.out.println("* delete query "+deleteQuery);
+
+            Cursor cur = dB.rawQuery(deleteQuery, null);
+
+            count = cur.getCount();
+            if(count>0){
+                System.out.println("* deleted tbl "+count);
+
+            }
+
+        } catch (Exception e) {
+
+            Log.v(" Exception", e.toString());
+
+        } finally {
+            if (cursor !=null) {
+                cursor.close();
+            }
+            dB.close();
+        }
+        return count;
+    }
+
+    public int deleteAllCategory(String c_id,String userID) {
+
+        int count =0;
+        if(dB == null){
+            open();
+        }else if(!dB.isOpen()){
+            open();
+        }
+        Cursor cursor = null;
+
+        try{
+
+            String deleteQuery = "DELETE FROM "+dbHelper.TABLE_MANUAL_CONTROL
+                    +" WHERE "+dbHelper.M_CATEGORY_ID +" = '"+c_id+"' AND "+dbHelper.M_USER_ID +" = '"+userID+"'";
+
+            System.out.println("* delete query "+deleteQuery);
+
+            Cursor cur = dB.rawQuery(deleteQuery, null);
+
+            count = cur.getCount();
+            if(count>0){
+                System.out.println("* deleted tbl "+count);
+
+            }
+
+        } catch (Exception e) {
+
+            Log.v(" Exception", e.toString());
+
+        } finally {
+            if (cursor !=null) {
+                cursor.close();
+            }
+            dB.close();
+        }
+        return count;
+    }
+    public int deletelabel(String label,String userID) {
+
+        int count =0;
+        if(dB == null){
+            open();
+        }else if(!dB.isOpen()){
+            open();
+        }
+        Cursor cursor = null;
+
+        try{
+
+            String deleteQuery = "DELETE FROM "+dbHelper.TABLE_MANUAL_CONTROL
+                    +" WHERE "+dbHelper.M_LABEL +" = '"+label+"' AND "+dbHelper.M_USER_ID +" = '"+userID+"'";
 
             System.out.println("* delete query "+deleteQuery);
 

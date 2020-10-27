@@ -17,9 +17,17 @@ import com.travijuu.numberpicker.library.NumberPicker;
 import java.util.ArrayList;
 
 import lk.iot.lmsrealtime1.R;
+import lk.iot.lmsrealtime1.data.AutomaticScheduleDAO;
 import lk.iot.lmsrealtime1.data.Category3HomeApplianceDAO;
 import lk.iot.lmsrealtime1.data.FirebaseDAO;
+import lk.iot.lmsrealtime1.data.ManualControlDAO;
+import lk.iot.lmsrealtime1.data.ScheduleManualCookingDAO;
+import lk.iot.lmsrealtime1.data.ScheduleManualFlexibleLoadsDAO;
+import lk.iot.lmsrealtime1.model.AutomaticSchedule;
+import lk.iot.lmsrealtime1.model.Category2HomeAppliance;
 import lk.iot.lmsrealtime1.model.Category3HomeAppliance;
+import lk.iot.lmsrealtime1.model.ManualControl;
+import lk.iot.lmsrealtime1.model.ScheduleManual;
 
 public class Category3Activity extends AppCompatActivity {
 
@@ -85,14 +93,123 @@ public class Category3Activity extends AppCompatActivity {
                 new FirebaseDAO(Category3Activity.this).getCategory("category3");
                 startActivity(new Intent(getApplicationContext(),HomeApplianceActivity.class));
 
-                //timout 100
+                for(Category3HomeAppliance category3 : appliancelist){
+                    ArrayList<ManualControl> AllCategoryList = new ManualControlDAO(Category3Activity.this).getAllCategory(category3.getC3_ID(), userId);
+                    ArrayList<AutomaticSchedule> AllAutomaticScheduleList = new AutomaticScheduleDAO(Category3Activity.this).getAllCategory(userId,category3.getC3_ID() );
+                    ArrayList<ScheduleManual> AllScheduleManualFlexibleList = new ScheduleManualFlexibleLoadsDAO(Category3Activity.this).getAllCategory(userId,category3.getC3_ID());
+                    if(!category3.getC3_LABEL().equals("Power Bank")) {
+
+                        if (category3.getC3_STATUS_OR_COUNT().equalsIgnoreCase("yes")) {
+
+                            new ManualControlDAO(Category3Activity.this).insert(category3.getC3_ID(), userId, category3.getC3_LABEL());
+                            new ScheduleManualFlexibleLoadsDAO(Category3Activity.this).insert(category3.getC3_ID(),userId, category3.getC3_LABEL());
+                           if(!category3.getC3_LABEL().equals("Iron")) {
+                               new AutomaticScheduleDAO(Category3Activity.this).insert(userId, category3.getC3_LABEL(), category3.getC3_ID());
+                           }
+
+                        } else {
+                            //remove all categories
+                            if (AllCategoryList.size() > 0) {
+                                new ManualControlDAO(Category3Activity.this).deleteAllCategory(category3.getC3_ID(), userId);
+                                for (ManualControl m : AllCategoryList) {
+                                    String path = "users/" + userId + "/manualControl";
+                                    new FirebaseDAO(Category3Activity.this).deleteFromFirebase(path, m.getM_ID());
+                                }
+                            }
+
+                            ScheduleManual scheduleManual = new ScheduleManualFlexibleLoadsDAO(Category3Activity.this).getFromLabel(userId, category3.getC3_LABEL());
+                            if (scheduleManual != null) {
+                                //delete
+                                new ScheduleManualFlexibleLoadsDAO(Category3Activity.this).delete(userId,category3.getC3_LABEL());
+                                String path = "users/" + userId + "/ScheduleFlexibleLoads";
+                                new FirebaseDAO(Category3Activity.this).deleteFromFirebase(path, scheduleManual.getS_ID() + "");
+                            }
+                            AutomaticSchedule automaticSchedule = new AutomaticScheduleDAO(Category3Activity.this).getFromLabel(userId, category3.getC3_LABEL());
+                            if (automaticSchedule != null) {
+                                //delete
+                                new AutomaticScheduleDAO(Category3Activity.this).delete(userId,category3.getC3_LABEL());
+                                String path = "users/" + userId + "/automaticSchedule";
+                                new FirebaseDAO(Category3Activity.this).deleteFromFirebase(path, automaticSchedule.getA_ID()+"");
+                            }
+
+
+                        }
+                    }else{
+                        int Category_count = Integer.parseInt(category3.getC3_STATUS_OR_COUNT());
+                        if(Category_count > 0){
+
+                            //if count is different
+
+
+                            if(AllCategoryList.size() > Category_count){
+                                //remove last
+                                int diff = AllCategoryList.size() - Category_count; //3-1 = 2
+                                for(int i=0;i<diff;i++){
+                                    String path = "users/" + userId + "/manualControl";
+
+                                    new ManualControlDAO(Category3Activity.this).deletelabel(category3.getC3_LABEL()+" "+(AllCategoryList.size()-i),userId);
+                                    new FirebaseDAO(Category3Activity.this).deleteFromFirebase(path,AllCategoryList.get(AllCategoryList.size()-i-1).getM_ID());
+
+                                    String path_auto = "users/" + userId + "/automaticSchedule";
+
+                                    new AutomaticScheduleDAO(Category3Activity.this).delete(userId,category3.getC3_LABEL()+" "+(AllAutomaticScheduleList.size()-i));
+                                    new FirebaseDAO(Category3Activity.this).deleteFromFirebase(path_auto,AllAutomaticScheduleList.get(AllAutomaticScheduleList.size()-i-1).getA_ID()+"");
+
+                                    String path_schedule = "users/" + userId + "/ScheduleFlexibleLoads";
+
+                                    new ScheduleManualFlexibleLoadsDAO(Category3Activity.this).delete(userId,category3.getC3_LABEL()+" "+(AllScheduleManualFlexibleList.size()-i));
+                                    new FirebaseDAO(Category3Activity.this).deleteFromFirebase(path_schedule,AllScheduleManualFlexibleList.get(AllScheduleManualFlexibleList.size()-i-1).getS_ID()+"");
+
+                                }
+                            }else{
+                                //insert new
+                                for(int i=0;i<Category_count ; i++){
+                                    new ManualControlDAO(Category3Activity.this).insert(category3.getC3_ID(),userId,category3.getC3_LABEL()+" "+(i+1));
+                                    new AutomaticScheduleDAO(Category3Activity.this).insert(userId,category3.getC3_LABEL()+" "+(i+1),category3.getC3_ID());
+                                    new ScheduleManualFlexibleLoadsDAO(Category3Activity.this).insert(category3.getC3_ID(),userId,category3.getC3_LABEL()+" "+(i+1));
+                                }
+                            }
+
+                        }else{
+                            //remove all categories
+
+                            if(AllCategoryList.size()>0) {
+                                new ManualControlDAO(Category3Activity.this).deleteAllCategory(category3.getC3_ID(), userId);
+                                for(ManualControl m : AllCategoryList){
+                                    String path = "users/" + userId + "/manualControl";
+                                    new FirebaseDAO(Category3Activity.this).deleteFromFirebase(path,m.getM_ID());
+                                }
+
+                            }
+                            if(AllAutomaticScheduleList.size()>0) {
+                                new AutomaticScheduleDAO(Category3Activity.this).deleteAllCategory(userId,category3.getC3_ID());
+                                for(AutomaticSchedule as : AllAutomaticScheduleList){
+                                    String path = "users/" + userId + "/automaticSchedule";
+                                    new FirebaseDAO(Category3Activity.this).deleteFromFirebase(path,as.getA_ID()+"");
+                                }
+
+                            }
+                            if(AllScheduleManualFlexibleList.size()>0) {
+                                new ScheduleManualFlexibleLoadsDAO(Category3Activity.this).deleteAllCategory(userId,category3.getC3_ID());
+                                for(ScheduleManual sm : AllScheduleManualFlexibleList){
+                                    String path = "users/" + userId + "/ScheduleFlexibleLoads";
+                                    new FirebaseDAO(Category3Activity.this).deleteFromFirebase(path,sm.getS_ID()+"");
+                                }
+
+                            }
+                        }
+
+                    }
+                }
+
+                //timout
                 new Handler().postDelayed(new Runnable() {
                     public void run() {
                         progressBar.setVisibility(View.GONE);
                         Toast.makeText(Category3Activity.this,count+ " Records Inserted ",Toast.LENGTH_LONG).show();
                         startActivity(new Intent(getApplicationContext(),HomeApplianceActivity.class));
                     }
-                }, 5600);
+                }, 10600);
             }
 
         });

@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import lk.iot.lmsrealtime1.db.DatabaseHelper;
 import lk.iot.lmsrealtime1.model.Category1HomeAppliance;
 import lk.iot.lmsrealtime1.model.Category2HomeAppliance;
+import lk.iot.lmsrealtime1.model.ManualControl;
 
 public class Category2HomeApplianceDAO {
 
@@ -91,9 +92,7 @@ public class Category2HomeApplianceDAO {
 
                 count = (int) dB.update(dbHelper.TABLE_CATEGORY2_HOME_APPLIANCE, values, dbHelper.C2_ID + " =?", new String[]{homeAppliance.getC2_ID()+""});
 
-                if (homeAppliance.getC2_STATUS().equalsIgnoreCase("no")) {
 
-                }
                 if(count>0){
                     System.out.println("* updated "+count);
                 }
@@ -107,6 +106,20 @@ public class Category2HomeApplianceDAO {
             dB.close();
         }
         return count;
+    }
+
+    private void checkOtherTables(String c2_id,String userId) {
+        //status is no so, remove from local dbs and firebase db
+        //check manualcontrol db
+        ManualControl m = new ManualControlDAO(context).get(c2_id,userId);
+        if(m != null){
+
+            //delete from firebase
+            String path = "users/" + userId + "/manualControl";
+            new FirebaseDAO(context).deleteFromFirebase(path,c2_id);
+            //delete from local
+            new ManualControlDAO(context).delete(c2_id,userId);
+        }
     }
 
     //##################### GET ####################

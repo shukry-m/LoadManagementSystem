@@ -68,6 +68,7 @@ public class ScheduleManualCookingDAO {
 
                 values.put(dbHelper.S_LABEL, scheduleManual.getS_LABEL());
                 values.put(dbHelper.S_USER_ID, scheduleManual.getS_USER_ID());
+                values.put(dbHelper.S_CATEGORY_ID, scheduleManual.getS_Category_Id());
                 values.put(dbHelper.S_Start_Time_Hour, scheduleManual.getS_Start_Time_Hour());
                 values.put(dbHelper.S_Start_Time_Minute, scheduleManual.getS_Start_Time_Minute());
                 values.put(dbHelper.S_End_Time_Hour, scheduleManual.getS_End_Time_Hour());
@@ -85,6 +86,7 @@ public class ScheduleManualCookingDAO {
 
                 values.put(dbHelper.S_LABEL, scheduleManual.getS_LABEL());
                 values.put(dbHelper.S_USER_ID, scheduleManual.getS_USER_ID());
+                values.put(dbHelper.S_CATEGORY_ID, scheduleManual.getS_Category_Id());
                 values.put(dbHelper.S_Start_Time_Hour, scheduleManual.getS_Start_Time_Hour());
                 values.put(dbHelper.S_Start_Time_Minute, scheduleManual.getS_Start_Time_Minute());
                 values.put(dbHelper.S_End_Time_Hour, scheduleManual.getS_End_Time_Hour());
@@ -111,7 +113,7 @@ public class ScheduleManualCookingDAO {
 
 
     // insert new label
-    public int insert(String userId,String label) {
+    public int insert(String category_id,String userId,String label) {
         int count =0;
 
         System.out.println(userId +": "+ label);
@@ -136,6 +138,7 @@ public class ScheduleManualCookingDAO {
 
                 values.put(dbHelper.S_LABEL, label);
                 values.put(dbHelper.S_USER_ID, userId);
+                values.put(dbHelper.S_CATEGORY_ID, category_id);
                 values.put(dbHelper.S_Start_Time_Hour,"00");
                 values.put(dbHelper.S_Start_Time_Minute,"00");
                 values.put(dbHelper.S_End_Time_Hour,"00");
@@ -172,20 +175,7 @@ public class ScheduleManualCookingDAO {
 
 
 
-    void insertNewLabel(String label, String status, String userID){
 
-        try{
-            if(status.equalsIgnoreCase("yes")){
-                insert(userID,label);
-            }else{
-                delete(userID,label);
-            }
-
-        }catch (Exception e) {
-            e.printStackTrace();
-        }
-
-    }
 
 
 
@@ -214,6 +204,7 @@ public class ScheduleManualCookingDAO {
                 h.setS_ID(cur.getInt(cur.getColumnIndex(dbHelper.S_ID)));
                 h.setS_LABEL(cur.getString(cur.getColumnIndex(dbHelper.S_LABEL)));
                 h.setS_USER_ID(cur.getString(cur.getColumnIndex(dbHelper.S_USER_ID)));
+                h.setS_Category_Id(cur.getString(cur.getColumnIndex(dbHelper.S_CATEGORY_ID)));
                 h.setS_Start_Time_Hour(cur.getString(cur.getColumnIndex(dbHelper.S_Start_Time_Hour)));
                 h.setS_Start_Time_Minute(cur.getString(cur.getColumnIndex(dbHelper.S_Start_Time_Minute)));
                 h.setS_End_Time_Hour(cur.getString(cur.getColumnIndex(dbHelper.S_End_Time_Hour)));
@@ -228,6 +219,47 @@ public class ScheduleManualCookingDAO {
         }
 
         return list;
+    }
+
+    public ScheduleManual getFromLabel(String userID,String label){
+
+        ScheduleManual h = new ScheduleManual();
+
+        if(dB == null){
+            open();
+        }else if(!dB.isOpen()){
+            open();
+        }
+
+        try{
+
+            String select = "SELECT * FROM " + dbHelper.TABLE_SCHEDULE_MANUAL_COOKING +" WHERE "+dbHelper.S_USER_ID+" = '"+userID+
+                    "' AND "+dbHelper.S_LABEL+" = '"+label+"'";
+
+            Log.v("Query",select);
+
+            Cursor cur = dB.rawQuery(select, null);
+
+            while (cur.moveToNext()) {
+
+                h.setS_ID(cur.getInt(cur.getColumnIndex(dbHelper.S_ID)));
+                h.setS_LABEL(cur.getString(cur.getColumnIndex(dbHelper.S_LABEL)));
+                h.setS_USER_ID(cur.getString(cur.getColumnIndex(dbHelper.S_USER_ID)));
+                h.setS_Category_Id(cur.getString(cur.getColumnIndex(dbHelper.S_CATEGORY_ID)));
+                h.setS_Start_Time_Hour(cur.getString(cur.getColumnIndex(dbHelper.S_Start_Time_Hour)));
+                h.setS_Start_Time_Minute(cur.getString(cur.getColumnIndex(dbHelper.S_Start_Time_Minute)));
+                h.setS_End_Time_Hour(cur.getString(cur.getColumnIndex(dbHelper.S_End_Time_Hour)));
+                h.setS_End_Time_Minute(cur.getString(cur.getColumnIndex(dbHelper.S_End_Time_Minute)));
+
+            }
+
+        }catch (Exception e) {
+           e.printStackTrace();
+        }finally {
+            dB.close();
+        }
+
+        return h;
     }
 
 

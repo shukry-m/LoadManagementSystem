@@ -94,6 +94,7 @@ public class Category3HomeApplianceDAO {
                 if(count>0){
                     System.out.println("* updated "+count);
                 }
+
             }
 
 

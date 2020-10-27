@@ -123,6 +123,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String S_ID = "s_Id";
     public static final String S_USER_ID = "s_user_id";
     public static final String S_LABEL = "s_label_name";
+    public static final String S_CATEGORY_ID = "s_category_id";
     public static final String S_Start_Time_Hour  =  "s_start_time_hour";
     public static final String S_Start_Time_Minute  =  "s_start_time_minute";
     public static final String S_End_Time_Hour  =  "s_end_time_hour";
@@ -134,6 +135,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             + S_ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
             + S_USER_ID + " TEXT, "
             + S_LABEL + " TEXT, "
+            + S_CATEGORY_ID + " TEXT, "
             + S_Start_Time_Hour + " TEXT, "
             + S_Start_Time_Minute + " TEXT, "
             + S_End_Time_Hour + " TEXT, "
@@ -147,6 +149,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String F_ID = "f_Id";
     public static final String F_USER_ID = "f_user_id";
     public static final String F_LABEL = "f_label_name";
+    public static final String F_CATEGORY_ID = "f_category_id";
     public static final String F_Start_Time_Hour  =  "f_start_time_hour";
     public static final String F_Start_Time_Minute  =  "f_start_time_minute";
     public static final String F_End_Time_Hour  =  "f_end_time_hour";
@@ -158,6 +161,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             + F_ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
             + F_USER_ID + " TEXT, "
             + F_LABEL + " TEXT, "
+            + F_CATEGORY_ID + " TEXT, "
             + F_Start_Time_Hour + " TEXT, "
             + F_Start_Time_Minute + " TEXT, "
             + F_End_Time_Hour + " TEXT, "

@@ -116,7 +116,7 @@ public class AutomaticScheduleDAO {
 
     // insert new label
 
-    public int insert(String userId,String label,String statusOrcount,String category_id) {
+    public int insert(String userId,String label,String category_id) {
         int count =0;
 
         System.out.println(userId +": "+ label);
@@ -159,7 +159,7 @@ public class AutomaticScheduleDAO {
                 //update
 
                 //check is powerbank 2 3 case
-                System.out.println("* automatic control already has "+label+" statusOrcount "+statusOrcount);
+                System.out.println("* automatic control already has "+label);
             }
 
 
@@ -183,7 +183,7 @@ public class AutomaticScheduleDAO {
 
 
 
-    void insertNewLabel(String label, String countORstatus, String userID,String category_id){
+   /* void insertNewLabel(String label, String countORstatus, String userID,String category_id){
 
         System.out.println(" *** insert new label Automatic"+label+" : "+countORstatus +" : "+category_id);
         System.out.println(" *** userID "+userID);
@@ -206,7 +206,7 @@ public class AutomaticScheduleDAO {
             e.printStackTrace();
         }
 
-    }
+    }*/
 
     //##################### GET ####################
         public ArrayList<AutomaticSchedule> getAll(String userID){
@@ -255,7 +255,8 @@ public class AutomaticScheduleDAO {
 
         return list;
     }
-    public ArrayList<AutomaticSchedule> getAllStatusIsON(String userID){
+
+    public ArrayList<AutomaticSchedule> getAllCategory(String userID,String category_id){
 
         ArrayList<AutomaticSchedule> list = new ArrayList<>();
 
@@ -267,8 +268,13 @@ public class AutomaticScheduleDAO {
 
         try{
 
-            String select = "SELECT * FROM " + dbHelper.TABLE_SCHEDULE_AUTOMATIC +" WHERE "+dbHelper.A_USER_ID+" = '"+userID +
-                    "' AND "+dbHelper.A_STATUS +"= '1'";
+            String select = "SELECT * FROM " + dbHelper.TABLE_SCHEDULE_AUTOMATIC +" WHERE "+dbHelper.A_USER_ID+" = '"+userID+
+                    "' ORDER BY "+dbHelper.A_CATEGORY_ID+" = '"+category_id+"'";
+
+            /*String select = "SELECT * FROM " + dbHelper.TABLE_SCHEDULE_AUTOMATIC +" WHERE "+dbHelper.A_USER_ID+" = '"+userID+"' AND "+dbHelper.A_CATEGORY_ID +
+                    " IN (SELECT "+dbHelper.C3_ID+" FROM "+dbHelper.TABLE_CATEGORY3_HOME_APPLIANCE+" WHERE "+dbHelper.C3_STATUS_OR_COUNT+" = 'Yes' )"+
+                    " ORDER BY "+dbHelper.A_LABEL+" ASC";*/
+
 
             Log.v("Query",select);
 
@@ -295,6 +301,47 @@ public class AutomaticScheduleDAO {
         }
 
         return list;
+    }
+
+    public AutomaticSchedule getFromLabel(String userID,String label){
+
+       AutomaticSchedule h = new AutomaticSchedule();
+
+        if(dB == null){
+            open();
+        }else if(!dB.isOpen()){
+            open();
+        }
+
+        try{
+
+            String select = "SELECT * FROM " + dbHelper.TABLE_SCHEDULE_AUTOMATIC +" WHERE "+dbHelper.A_USER_ID+" = '"+userID +
+                    "' AND "+dbHelper.A_LABEL +"= '"+label+"'";
+
+            Log.v("Query",select);
+
+            Cursor cur = dB.rawQuery(select, null);
+
+            while (cur.moveToNext()) {
+                h.setA_ID(cur.getInt(cur.getColumnIndex(dbHelper.A_ID)));
+                h.setA_LABEL(cur.getString(cur.getColumnIndex(dbHelper.A_LABEL)));
+                h.setA_STATUS(cur.getString(cur.getColumnIndex(dbHelper.A_STATUS)));
+                h.setA_USER_ID(cur.getString(cur.getColumnIndex(dbHelper.A_USER_ID)));
+                h.setA_CATEGORY_ID(cur.getString(cur.getColumnIndex(dbHelper.A_CATEGORY_ID)));
+                h.setA_START_TIME_HOUR(cur.getString(cur.getColumnIndex(dbHelper.A_START_TIME_HOUR)));
+                h.setA_START_TIME_MINUTE(cur.getString(cur.getColumnIndex(dbHelper.A_START_TIME_MINUTE)));
+                h.setA_END_TIME_HOUR(cur.getString(cur.getColumnIndex(dbHelper.A_END_TIME_HOUR)));
+                h.setA_END_TIME_MINUTE(cur.getString(cur.getColumnIndex(dbHelper.A_END_TIME_MINUTE)));
+
+            }
+
+        }catch (Exception e) {
+           e.printStackTrace();
+        }finally {
+            dB.close();
+        }
+
+        return h;
     }
 
 
@@ -352,6 +399,44 @@ public class AutomaticScheduleDAO {
 
             String deleteQuery = "DELETE FROM "+dbHelper.TABLE_SCHEDULE_AUTOMATIC
                     +" WHERE "+dbHelper.A_USER_ID +" = '"+userID+"' AND "+dbHelper.A_LABEL+" = '"+label+"'";
+
+            System.out.println("* delete query "+deleteQuery);
+
+            Cursor cur = dB.rawQuery(deleteQuery, null);
+
+            count = cur.getCount();
+            if(count>0){
+                System.out.println("Deleted ");
+            }
+
+        } catch (Exception e) {
+
+            Log.v(" Exception", e.toString());
+
+        } finally {
+            if (cursor !=null) {
+                cursor.close();
+            }
+            dB.close();
+        }
+        return count;
+
+    }
+
+    public  int deleteAllCategory(String userID,String category_id){
+        int count = 0;
+
+        if(dB == null){
+            open();
+        }else if(!dB.isOpen()){
+            open();
+        }
+        Cursor cursor = null;
+
+        try{
+
+            String deleteQuery = "DELETE FROM "+dbHelper.TABLE_SCHEDULE_AUTOMATIC
+                    +" WHERE "+dbHelper.A_USER_ID +" = '"+userID+"' AND "+dbHelper.A_CATEGORY_ID+" = '"+category_id+"'";
 
             System.out.println("* delete query "+deleteQuery);
 

@@ -174,7 +174,7 @@ public class ScheduleManualCookingActivity extends AppCompatActivity  {
 
                         BigDecimal b = new BigDecimal(StartTimeList.get(scheduleManual.getS_LABEL()));
 
-                        b= b.setScale(2, BigDecimal.ROUND_HALF_EVEN);
+                        b= b.setScale(2, BigDecimal.ROUND_HALF_EVEN).abs();
 
                         System.out.println(StartTimeList.put(scheduleManual.getS_LABEL(),b.doubleValue()));
                     }

@@ -58,7 +58,7 @@ public class HomeApplianceActivity extends AppCompatActivity {
         new FirebaseDAO(HomeApplianceActivity.this).getCategory("category1");
         new FirebaseDAO(HomeApplianceActivity.this).getCategory("category2");
         new FirebaseDAO(HomeApplianceActivity.this).getCategory("category3");
-        //new FirebaseDAO(HomeApplianceActivity.this).getManualControl();
+        new FirebaseDAO(HomeApplianceActivity.this).getManualControl();
 
 
     }

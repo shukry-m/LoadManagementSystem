@@ -9,6 +9,7 @@ public class ScheduleManual {
     private String S_Start_Time_Minute;
     private String S_End_Time_Hour;
     private String S_End_Time_Minute;
+    private String S_Category_Id;
 
     public ScheduleManual() {
     }
@@ -79,6 +80,14 @@ public class ScheduleManual {
         S_End_Time_Minute = s_End_Time_Minute;
     }
 
+    public String getS_Category_Id() {
+        return S_Category_Id;
+    }
+
+    public void setS_Category_Id(String s_Category_Id) {
+        S_Category_Id = s_Category_Id;
+    }
+
     @Override
     public String toString() {
         return "ScheduleManual{" +
@@ -89,6 +98,7 @@ public class ScheduleManual {
                 ", S_Start_Time_Minute='" + S_Start_Time_Minute + '\'' +
                 ", S_End_Time_Hour='" + S_End_Time_Hour + '\'' +
                 ", S_End_Time_Minute='" + S_End_Time_Minute + '\'' +
+                ", S_Category_Id='" + S_Category_Id + '\'' +
                 '}';
     }
 }
