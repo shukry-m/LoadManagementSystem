@@ -9,9 +9,9 @@ import android.widget.CompoundButton;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.Toast;
+import android.widget.ToggleButton;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -23,9 +23,11 @@ import java.util.Map;
 
 import lk.iot.lmsrealtime1.R;
 import lk.iot.lmsrealtime1.adapter.ManualControlAdapter;
-import lk.iot.lmsrealtime1.data.Firebase1DAO;
+import lk.iot.lmsrealtime1.data.AllStatusDAO;
+import lk.iot.lmsrealtime1.data.FirebaseDAO;
 import lk.iot.lmsrealtime1.data.ManualControlDAO;
 import lk.iot.lmsrealtime1.helper.ClickListener;
+import lk.iot.lmsrealtime1.model.AllStatus;
 import lk.iot.lmsrealtime1.model.ManualControl;
 
 
@@ -40,6 +42,7 @@ public class ManualControlActivity extends AppCompatActivity {
     Button btn_save;
     String userID;
     ProgressBar progressBar;
+    ToggleButton Manual_Switch;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -52,7 +55,7 @@ public class ManualControlActivity extends AppCompatActivity {
         //MCToolBar.setTitle("Manual Control");
         progressBar = findViewById(R.id.progressBar);
         NoData = findViewById(R.id.NoData);
-
+        Manual_Switch = findViewById(R.id.Manual_Switch);
         downloadData();
 
         final HashMap<String, ManualControl> dbList = new HashMap<>();
@@ -124,9 +127,22 @@ public class ManualControlActivity extends AppCompatActivity {
 
                 }
                 final int sum = count;
-                ArrayList<ManualControl> allData = new ManualControlDAO(ManualControlActivity.this).getAll(userID);
+                AllStatus allStatus = new AllStatus(userID,"manualControl");
+                    if(Manual_Switch.getText().toString().equalsIgnoreCase("on")){
+                        allStatus.setALL_STATUS("1");
+                    }else{
+                        allStatus.setALL_STATUS("0");
+                    }
+                    allStatus.setALL_ID(2);
 
-                new Firebase1DAO(ManualControlActivity.this).insertManualControl(allData);
+
+                new AllStatusDAO(ManualControlActivity.this).insert(allStatus);
+                ArrayList<ManualControl> allData = new ManualControlDAO(ManualControlActivity.this).getAll(userID);
+                AllStatus allSt = new AllStatusDAO(ManualControlActivity.this).get("manualControl",userID);
+
+                new FirebaseDAO(ManualControlActivity.this).insertManualControlStatus(allSt);
+
+                new FirebaseDAO(ManualControlActivity.this).insertManualControl(allData);
 
 
                 new Handler().postDelayed(new Runnable() {
@@ -142,8 +158,22 @@ public class ManualControlActivity extends AppCompatActivity {
     }
 
     void downloadData(){
-        new Firebase1DAO(ManualControlActivity.this).getManualControl();
-        list = new ManualControlDAO(ManualControlActivity.this).getAll(userID);
+        new FirebaseDAO(ManualControlActivity.this).getManualControl();
+        new FirebaseDAO(ManualControlActivity.this).getManualControlStatus();
+        try {
+            list = new ManualControlDAO(ManualControlActivity.this).getAll(userID);
+            AllStatus allStatus = new AllStatusDAO(ManualControlActivity.this).get("manualControl", userID);
+            System.out.println(allStatus);
+            if (allStatus.getALL_STATUS().equals("1")) {
+                Manual_Switch.setText("ON");
+            } else {
+                Manual_Switch.setText("OFF");
+            }
+        }catch (Exception e){
+            Manual_Switch.setText("OFF");
+            e.printStackTrace();
+        }
+
     }
 
     @Override

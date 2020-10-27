@@ -34,7 +34,7 @@ import java.util.Map;
 
 import lk.iot.lmsrealtime1.R;
 import lk.iot.lmsrealtime1.adapter.ScheduleManualAdapter;
-import lk.iot.lmsrealtime1.data.Firebase1DAO;
+import lk.iot.lmsrealtime1.data.FirebaseDAO;
 import lk.iot.lmsrealtime1.data.ScheduleManualCookingDAO;
 import lk.iot.lmsrealtime1.helper.ClickListener;
 import lk.iot.lmsrealtime1.helper.TimePickerFragment;
@@ -91,7 +91,8 @@ public class ScheduleManualCookingActivity extends AppCompatActivity  {
                         @Override
                         public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
 
-                            mn.setS_End_Time(getTwoValue(hourOfDay) + ":" + getTwoValue(minute));
+                            mn.setS_End_Time_Hour(getTwoValue(hourOfDay));
+                            mn.setS_End_Time_Minute(getTwoValue(minute));
 
                             tex.setText(getTwoValue(hourOfDay) + ":" + getTwoValue(minute));
                         }
@@ -107,7 +108,8 @@ public class ScheduleManualCookingActivity extends AppCompatActivity  {
                         @Override
                         public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
 
-                            mn.setS_Start_Time(getTwoValue(hourOfDay) + ":" + getTwoValue(minute));
+                            mn.setS_Start_Time_Hour(getTwoValue(hourOfDay));
+                            mn.setS_Start_Time_Minute(getTwoValue(minute));
 
                             tex.setText(getTwoValue(hourOfDay) + ":" + getTwoValue(minute));
                         }
@@ -161,13 +163,13 @@ public class ScheduleManualCookingActivity extends AppCompatActivity  {
                 }
                 ArrayList<ScheduleManual> allData = new ScheduleManualCookingDAO(ScheduleManualCookingActivity.this).getAll(userID);
 
-                new Firebase1DAO(ScheduleManualCookingActivity.this).insertScheduleCooking(allData);
+                new FirebaseDAO(ScheduleManualCookingActivity.this).insertScheduleCooking(allData);
 
                 for(ScheduleManual scheduleManual:allData){
 
                     if(scheduleManual.getS_LABEL().equalsIgnoreCase("oven")) {
 
-                        double val = Calculation(scheduleManual.getS_LABEL(),scheduleManual.getS_Start_Time(),scheduleManual.getS_End_Time());
+                        double val = Calculation(scheduleManual.getS_LABEL(),scheduleManual.getS_Start_Time_Hour()+":"+scheduleManual.getS_Start_Time_Minute(),scheduleManual.getS_End_Time_Hour()+":"+scheduleManual.getS_End_Time_Minute());
                         System.out.println(val/60.0);
 
                         BigDecimal b = new BigDecimal(StartTimeList.get(scheduleManual.getS_LABEL()));
@@ -247,6 +249,9 @@ public class ScheduleManualCookingActivity extends AppCompatActivity  {
 
                 if(end_.before(time2_calendar.getTime()) || end_.equals(time2_calendar.getTime())){
 
+                    /* BigDecimal b = new BigDecimal(StartTimeList.get(scheduleManual.getS_LABEL()));
+
+                        b= b.setScale(2, BigDecimal.ROUND_HALF_EVEN);*/
                     double cal_hour = (end_.getTime() - start_.getTime()) / (60000);
                      used_hour += (end_.getTime() - start_.getTime()) / (60000); //* 23
                      System.out.println(used_hour);
@@ -498,7 +503,7 @@ public class ScheduleManualCookingActivity extends AppCompatActivity  {
     }
 
     void downloadData() {
-        new Firebase1DAO(ScheduleManualCookingActivity.this).getScheduleCooking();
+        new FirebaseDAO(ScheduleManualCookingActivity.this).getScheduleCooking();
         list = new ScheduleManualCookingDAO(ScheduleManualCookingActivity.this).getAll(userID);
     }
 

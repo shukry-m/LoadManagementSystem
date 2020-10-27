@@ -7,8 +7,10 @@ public class AutomaticSchedule {
     private String A_LABEL;
     private String A_STATUS;
     private String A_CATEGORY_ID;
-    private String A_START_TIME;
-    private String A_END_TIME;
+    private String A_START_TIME_HOUR;
+    private String A_START_TIME_MINUTE;
+    private String A_END_TIME_HOUR;
+    private String A_END_TIME_MINUTE;
 
     public AutomaticSchedule() {
     }
@@ -51,20 +53,36 @@ public class AutomaticSchedule {
         A_STATUS = a_STATUS;
     }
 
-    public String getA_START_TIME() {
-        return A_START_TIME;
+    public String getA_START_TIME_HOUR() {
+        return A_START_TIME_HOUR;
     }
 
-    public void setA_START_TIME(String a_START_TIME) {
-        A_START_TIME = a_START_TIME;
+    public void setA_START_TIME_HOUR(String a_START_TIME_HOUR) {
+        A_START_TIME_HOUR = a_START_TIME_HOUR;
     }
 
-    public String getA_END_TIME() {
-        return A_END_TIME;
+    public String getA_START_TIME_MINUTE() {
+        return A_START_TIME_MINUTE;
     }
 
-    public void setA_END_TIME(String a_END_TIME) {
-        A_END_TIME = a_END_TIME;
+    public void setA_START_TIME_MINUTE(String a_START_TIME_MINUTE) {
+        A_START_TIME_MINUTE = a_START_TIME_MINUTE;
+    }
+
+    public String getA_END_TIME_HOUR() {
+        return A_END_TIME_HOUR;
+    }
+
+    public void setA_END_TIME_HOUR(String a_END_TIME_HOUR) {
+        A_END_TIME_HOUR = a_END_TIME_HOUR;
+    }
+
+    public String getA_END_TIME_MINUTE() {
+        return A_END_TIME_MINUTE;
+    }
+
+    public void setA_END_TIME_MINUTE(String a_END_TIME_MINUTE) {
+        A_END_TIME_MINUTE = a_END_TIME_MINUTE;
     }
 
     public String getA_CATEGORY_ID() {
@@ -83,8 +101,10 @@ public class AutomaticSchedule {
                 ", A_LABEL='" + A_LABEL + '\'' +
                 ", A_STATUS='" + A_STATUS + '\'' +
                 ", A_CATEGORY_ID='" + A_CATEGORY_ID + '\'' +
-                ", A_START_TIME='" + A_START_TIME + '\'' +
-                ", A_END_TIME='" + A_END_TIME + '\'' +
+                ", A_START_TIME_HOUR='" + A_START_TIME_HOUR + '\'' +
+                ", A_START_TIME_MINUTE='" + A_START_TIME_MINUTE + '\'' +
+                ", A_END_TIME_HOUR='" + A_END_TIME_HOUR + '\'' +
+                ", A_END_TIME_MINUTE='" + A_END_TIME_MINUTE + '\'' +
                 '}';
     }
 }

@@ -23,12 +23,9 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 
 import lk.iot.lmsrealtime1.R;
-import lk.iot.lmsrealtime1.data.Firebase1DAO;
 import lk.iot.lmsrealtime1.data.FirebaseDAO;
-import lk.iot.lmsrealtime1.model.User;
 
 public class LoginActivity extends AppCompatActivity {
     DatabaseReference ref;
@@ -82,16 +79,7 @@ public class LoginActivity extends AppCompatActivity {
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if(task.isSuccessful()){
                             String  userID = (fAuth.getCurrentUser()!= null)? fAuth.getCurrentUser().getUid():"0";
-                            new FirebaseDAO(LoginActivity.this).checkActive();
-                            String isActive = new FirebaseDAO(LoginActivity.this).checkActive();
-                            System.out.println("** "+isActive);
-                            if(isActive.equals("true")) {
-
-                                downloadFromFirebase();
-                            }else{
-                                progressBar.setVisibility(View.GONE);
-                                Toast.makeText(LoginActivity.this, "User is Inactive Please contact Administrator", Toast.LENGTH_SHORT).show();
-                            }
+                            downloadFromFirebase();
                         }else {
                             Toast.makeText(LoginActivity.this, "Error ! " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
                             progressBar.setVisibility(View.GONE);
@@ -157,13 +145,15 @@ public class LoginActivity extends AppCompatActivity {
     void downloadFromFirebase(){
 
         progressBar.setVisibility(View.VISIBLE);
-        new Firebase1DAO(LoginActivity.this).getCategory("category1");
-        new Firebase1DAO(LoginActivity.this).getCategory("category2");
-        new Firebase1DAO(LoginActivity.this).getCategory("category3");
-        new Firebase1DAO(LoginActivity.this).getManualControl();
-        new Firebase1DAO(LoginActivity.this).getAutomaicSchedule();
-        new Firebase1DAO(LoginActivity.this).getScheduleCooking();
-        new Firebase1DAO(LoginActivity.this).getScheduleFlexibleLoads();
+        new FirebaseDAO(LoginActivity.this).getCategory("category1");
+        new FirebaseDAO(LoginActivity.this).getCategory("category2");
+        new FirebaseDAO(LoginActivity.this).getCategory("category3");
+        new FirebaseDAO(LoginActivity.this).getManualControl();
+        new FirebaseDAO(LoginActivity.this).getAutomaicSchedule();
+        new FirebaseDAO(LoginActivity.this).getScheduleCooking();
+        new FirebaseDAO(LoginActivity.this).getScheduleFlexibleLoads();
+        new FirebaseDAO(LoginActivity.this).getManualControlStatus();
+        new FirebaseDAO(LoginActivity.this).getAutomaticScheduleStatus();
 
         new Handler().postDelayed(new Runnable() {
             public void run() {
@@ -171,7 +161,7 @@ public class LoginActivity extends AppCompatActivity {
                 Toast.makeText(LoginActivity.this, "Logged in Successfully", Toast.LENGTH_SHORT).show();
                 startActivity(new Intent(getApplicationContext(), MainActivity.class));
             }
-        }, 6600);
+        }, 7600);
         //  new ManualControlDAO(MainActivity.this).insertNewLabel(userID);
 
     }

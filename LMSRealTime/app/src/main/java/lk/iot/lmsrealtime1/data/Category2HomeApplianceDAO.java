@@ -91,6 +91,9 @@ public class Category2HomeApplianceDAO {
 
                 count = (int) dB.update(dbHelper.TABLE_CATEGORY2_HOME_APPLIANCE, values, dbHelper.C2_ID + " =?", new String[]{homeAppliance.getC2_ID()+""});
 
+                if (homeAppliance.getC2_STATUS().equalsIgnoreCase("no")) {
+
+                }
                 if(count>0){
                     System.out.println("* updated "+count);
                 }

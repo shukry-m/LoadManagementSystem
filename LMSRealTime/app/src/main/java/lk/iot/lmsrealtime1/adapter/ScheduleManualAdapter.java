@@ -42,8 +42,8 @@ public class ScheduleManualAdapter extends RecyclerView.Adapter<ScheduleManualAd
     public void onBindViewHolder(@NonNull final MyViewHolder holder, int position) {
        ScheduleManual scheduleCooking = list.get(position);
         holder.text.setText(scheduleCooking.getS_LABEL());
-        holder.starttime.setText(scheduleCooking.getS_Start_Time());
-        holder.endTime.setText(scheduleCooking.getS_End_Time());
+        holder.starttime.setText(scheduleCooking.getS_Start_Time_Hour()+":"+scheduleCooking.getS_End_Time_Minute());
+        holder.endTime.setText(scheduleCooking.getS_End_Time_Hour()+":"+scheduleCooking.getS_End_Time_Hour());
     }
 
     @Override

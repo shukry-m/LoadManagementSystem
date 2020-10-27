@@ -8,7 +8,6 @@ import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.FirebaseDatabase;
@@ -18,13 +17,11 @@ import java.util.ArrayList;
 
 import lk.iot.lmsrealtime1.R;
 import lk.iot.lmsrealtime1.data.Category1HomeApplianceDAO;
-import lk.iot.lmsrealtime1.data.Category3HomeApplianceDAO;
-import lk.iot.lmsrealtime1.data.Firebase1DAO;
+import lk.iot.lmsrealtime1.data.FirebaseDAO;
 import lk.iot.lmsrealtime1.model.Category1HomeAppliance;
 
 public class Category1Activity extends AppCompatActivity {
 
-   // Toolbar top_bar;
     NumberPicker Fan_number_picker,CFL_number_picker,LED_number_picker,
             Incandescent_number_picker,Halogen_number_picker;
     String userId = "0";
@@ -40,9 +37,6 @@ public class Category1Activity extends AppCompatActivity {
         fAuth = FirebaseAuth.getInstance();
         userId = (fAuth.getCurrentUser()!= null)? fAuth.getCurrentUser().getUid():"0";
         database = FirebaseDatabase.getInstance();
-
-       // top_bar =  findViewById(R.id.tb_category1);
-        //top_bar.setTitle("Category 1");
 
         Fan_number_picker =findViewById(R.id.Fan_number_picker);
 
@@ -77,9 +71,9 @@ public class Category1Activity extends AppCompatActivity {
         final int count = new Category1HomeApplianceDAO(Category1Activity.this).insert(list);
 
 
-        new Firebase1DAO(Category1Activity.this).insertCategory1(list);
+        new FirebaseDAO(Category1Activity.this).insertCategory1(list);
 
-        new Firebase1DAO(Category1Activity.this).getCategory("category1");
+        new FirebaseDAO(Category1Activity.this).getCategory("category1");
 
 
         new Handler().postDelayed(new Runnable() {

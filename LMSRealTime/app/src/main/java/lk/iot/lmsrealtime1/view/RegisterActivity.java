@@ -24,13 +24,7 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
-
-import java.util.HashMap;
-import java.util.Map;
-
 import lk.iot.lmsrealtime1.R;
-import lk.iot.lmsrealtime1.data.FirebaseDAO;
-import lk.iot.lmsrealtime1.data.ManualControlDAO;
 import lk.iot.lmsrealtime1.model.Profile;
 
 public class RegisterActivity extends AppCompatActivity {
@@ -62,7 +56,7 @@ public class RegisterActivity extends AppCompatActivity {
         progressBar = findViewById(R.id.progressBar);
         userID =  (fAuth.getCurrentUser()!= null)? fAuth.getCurrentUser().getUid():"0";
 
-        if(fAuth.getCurrentUser() != null && new FirebaseDAO(RegisterActivity.this).checkActive()!= null ){
+        if(fAuth.getCurrentUser() != null  ){
             if(!userID.equals("0")){
                 startActivity(new Intent(getApplicationContext(),MainActivity.class));
                 finish();

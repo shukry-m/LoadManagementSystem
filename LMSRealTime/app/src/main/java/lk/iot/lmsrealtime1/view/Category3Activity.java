@@ -10,7 +10,6 @@ import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.travijuu.numberpicker.library.NumberPicker;
@@ -19,7 +18,7 @@ import java.util.ArrayList;
 
 import lk.iot.lmsrealtime1.R;
 import lk.iot.lmsrealtime1.data.Category3HomeApplianceDAO;
-import lk.iot.lmsrealtime1.data.Firebase1DAO;
+import lk.iot.lmsrealtime1.data.FirebaseDAO;
 import lk.iot.lmsrealtime1.model.Category3HomeAppliance;
 
 public class Category3Activity extends AppCompatActivity {
@@ -81,9 +80,9 @@ public class Category3Activity extends AppCompatActivity {
 
                 final int count = new Category3HomeApplianceDAO(Category3Activity.this).insert(appliancelist);
 
-                new Firebase1DAO(Category3Activity.this).insertCategory3(appliancelist);
+                new FirebaseDAO(Category3Activity.this).insertCategory3(appliancelist);
 
-                new Firebase1DAO(Category3Activity.this).getCategory("category3");
+                new FirebaseDAO(Category3Activity.this).getCategory("category3");
                 startActivity(new Intent(getApplicationContext(),HomeApplianceActivity.class));
 
                 //timout 100
@@ -93,7 +92,7 @@ public class Category3Activity extends AppCompatActivity {
                         Toast.makeText(Category3Activity.this,count+ " Records Inserted ",Toast.LENGTH_LONG).show();
                         startActivity(new Intent(getApplicationContext(),HomeApplianceActivity.class));
                     }
-                }, 4600);
+                }, 5600);
             }
 
         });

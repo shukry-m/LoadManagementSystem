@@ -68,8 +68,10 @@ public class ScheduleManualCookingDAO {
 
                 values.put(dbHelper.S_LABEL, scheduleManual.getS_LABEL());
                 values.put(dbHelper.S_USER_ID, scheduleManual.getS_USER_ID());
-                values.put(dbHelper.S_Start_Time, scheduleManual.getS_Start_Time());
-                values.put(dbHelper.S_End_Time, scheduleManual.getS_End_Time());
+                values.put(dbHelper.S_Start_Time_Hour, scheduleManual.getS_Start_Time_Hour());
+                values.put(dbHelper.S_Start_Time_Minute, scheduleManual.getS_Start_Time_Minute());
+                values.put(dbHelper.S_End_Time_Hour, scheduleManual.getS_End_Time_Hour());
+                values.put(dbHelper.S_End_Time_Minute, scheduleManual.getS_End_Time_Minute());
 
 
                 count = (int) dB.insert(dbHelper.TABLE_SCHEDULE_MANUAL_COOKING, null, values);
@@ -83,8 +85,10 @@ public class ScheduleManualCookingDAO {
 
                 values.put(dbHelper.S_LABEL, scheduleManual.getS_LABEL());
                 values.put(dbHelper.S_USER_ID, scheduleManual.getS_USER_ID());
-                values.put(dbHelper.S_Start_Time, scheduleManual.getS_Start_Time());
-                values.put(dbHelper.S_End_Time, scheduleManual.getS_End_Time());
+                values.put(dbHelper.S_Start_Time_Hour, scheduleManual.getS_Start_Time_Hour());
+                values.put(dbHelper.S_Start_Time_Minute, scheduleManual.getS_Start_Time_Minute());
+                values.put(dbHelper.S_End_Time_Hour, scheduleManual.getS_End_Time_Hour());
+                values.put(dbHelper.S_End_Time_Minute, scheduleManual.getS_End_Time_Minute());
 
 
                 count = dB.update(dbHelper.TABLE_SCHEDULE_MANUAL_COOKING, values, dbHelper.S_ID + " =?", new String[]{scheduleManual.getS_ID()+"" });
@@ -132,8 +136,10 @@ public class ScheduleManualCookingDAO {
 
                 values.put(dbHelper.S_LABEL, label);
                 values.put(dbHelper.S_USER_ID, userId);
-                values.put(dbHelper.S_Start_Time,"00:00");
-                values.put(dbHelper.S_End_Time,"00:00");
+                values.put(dbHelper.S_Start_Time_Hour,"00");
+                values.put(dbHelper.S_Start_Time_Minute,"00");
+                values.put(dbHelper.S_End_Time_Hour,"00");
+                values.put(dbHelper.S_End_Time_Minute,"00");
 
                 count = (int) dB.insert(dbHelper.TABLE_SCHEDULE_MANUAL_COOKING, null, values);
 
@@ -208,8 +214,10 @@ public class ScheduleManualCookingDAO {
                 h.setS_ID(cur.getInt(cur.getColumnIndex(dbHelper.S_ID)));
                 h.setS_LABEL(cur.getString(cur.getColumnIndex(dbHelper.S_LABEL)));
                 h.setS_USER_ID(cur.getString(cur.getColumnIndex(dbHelper.S_USER_ID)));
-                h.setS_Start_Time(cur.getString(cur.getColumnIndex(dbHelper.S_Start_Time)));
-                h.setS_End_Time(cur.getString(cur.getColumnIndex(dbHelper.S_End_Time)));
+                h.setS_Start_Time_Hour(cur.getString(cur.getColumnIndex(dbHelper.S_Start_Time_Hour)));
+                h.setS_Start_Time_Minute(cur.getString(cur.getColumnIndex(dbHelper.S_Start_Time_Minute)));
+                h.setS_End_Time_Hour(cur.getString(cur.getColumnIndex(dbHelper.S_End_Time_Hour)));
+                h.setS_End_Time_Minute(cur.getString(cur.getColumnIndex(dbHelper.S_End_Time_Minute)));
                 list.add(h);
             }
 

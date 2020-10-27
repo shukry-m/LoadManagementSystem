@@ -12,7 +12,6 @@ import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -24,9 +23,11 @@ import java.util.Map;
 
 import lk.iot.lmsrealtime1.R;
 import lk.iot.lmsrealtime1.adapter.ScheduleAutomaticAdapter;
+import lk.iot.lmsrealtime1.data.AllStatusDAO;
 import lk.iot.lmsrealtime1.data.AutomaticScheduleDAO;
-import lk.iot.lmsrealtime1.data.Firebase1DAO;
+import lk.iot.lmsrealtime1.data.FirebaseDAO;
 import lk.iot.lmsrealtime1.helper.ClickListener;
+import lk.iot.lmsrealtime1.model.AllStatus;
 import lk.iot.lmsrealtime1.model.AutomaticSchedule;
 
 public class ScheduleAutomaticActivity extends AppCompatActivity {
@@ -98,16 +99,24 @@ public class ScheduleAutomaticActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 progressBar.setVisibility(View.VISIBLE);
+                AllStatus allStatus = new AllStatus(userID,"automaticSchedule");
                 if(Automatic_Switch.getText().toString().equalsIgnoreCase("on")){
-                    sum = SaveData("1" , dbList);
+                   allStatus.setALL_STATUS("1");
                 }else{
-                    sum = SaveData("0" , dbList);
+                    allStatus.setALL_STATUS("0");
                 }
 
+                allStatus.setALL_ID(1);
+                sum = SaveData("1" , dbList);
+
+                new AllStatusDAO(ScheduleAutomaticActivity.this).insert(allStatus);
 
                 ArrayList<AutomaticSchedule> allData = new AutomaticScheduleDAO(ScheduleAutomaticActivity.this).getAll(userID);
+                AllStatus allSt = new AllStatusDAO(ScheduleAutomaticActivity.this).get("automaticSchedule",userID);
 
-                new Firebase1DAO(ScheduleAutomaticActivity.this).insertAutomaicSchedule(allData);
+                new FirebaseDAO(ScheduleAutomaticActivity.this).insertAutomaticScheduleStatus(allSt);
+                new FirebaseDAO(ScheduleAutomaticActivity.this).insertAutomaicSchedule(allData);
+
 
                 new Handler().postDelayed(new Runnable() {
                     public void run() {
@@ -178,13 +187,19 @@ public class ScheduleAutomaticActivity extends AppCompatActivity {
     }
 
     void downloadData(){
-        new Firebase1DAO(ScheduleAutomaticActivity.this).getAutomaicSchedule();
+        new FirebaseDAO(ScheduleAutomaticActivity.this).getAutomaicSchedule();
+        new FirebaseDAO(ScheduleAutomaticActivity.this).getAutomaticScheduleStatus();
         list = new AutomaticScheduleDAO(ScheduleAutomaticActivity.this).getAll(userID);
-        ArrayList<AutomaticSchedule> getONStatusList = new AutomaticScheduleDAO(ScheduleAutomaticActivity.this).getAllStatusIsON(userID);
-        if(getONStatusList.size() > 0){
-            Automatic_Switch.setText("ON");
-        }else{
+        try {
+            AllStatus allStatus = new AllStatusDAO(ScheduleAutomaticActivity.this).get("automaticSchedule", userID);
+            if (allStatus.getALL_STATUS().equals("1")) {
+                Automatic_Switch.setText("ON");
+            } else {
+                Automatic_Switch.setText("OFF");
+            }
+        }catch (Exception e){
             Automatic_Switch.setText("OFF");
+            e.printStackTrace();
         }
     }
 

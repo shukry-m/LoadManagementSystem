@@ -6,6 +6,8 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.SuccessContinuation;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
@@ -16,47 +18,109 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
 
+import lk.iot.lmsrealtime1.model.AllStatus;
+import lk.iot.lmsrealtime1.model.AutomaticSchedule;
+import lk.iot.lmsrealtime1.model.Category1HomeAppliance;
+import lk.iot.lmsrealtime1.model.Category2HomeAppliance;
+import lk.iot.lmsrealtime1.model.Category3HomeAppliance;
 import lk.iot.lmsrealtime1.model.ManualControl;
+import lk.iot.lmsrealtime1.model.ScheduleManual;
 
 public class FirebaseDAO {
 
+
     Context context;
     FirebaseAuth fAuth;
-    String userID;
     public static final String TAG = "TAG";
     final FirebaseDatabase database;
+    private DatabaseReference mDatabase;
+    String userId;
 
     public FirebaseDAO(Context context) {
         this.context = context;
         fAuth = FirebaseAuth.getInstance();
-
+        mDatabase = FirebaseDatabase.getInstance().getReference();
         database = FirebaseDatabase.getInstance();
+        userId = (fAuth.getCurrentUser()!= null)? fAuth.getCurrentUser().getUid():"0";
     }
-    //############################### DOWNLOAD ###########################
 
-    public void downloadAllFromFireBase() {
+    public void insertCategory1(ArrayList<Category1HomeAppliance> list){
 
-        userID = (fAuth.getCurrentUser() != null) ? fAuth.getCurrentUser().getUid() : "0";
+        for(Category1HomeAppliance appliance : list){
+            //insertCategory1 to firebase
+            mDatabase.child("users").child(userId).child("appliance").child("category1").child(appliance.getC_ID()+"").setValue(appliance).addOnSuccessListener(new OnSuccessListener<Void>() {
+                @Override
+                public void onSuccess(Void aVoid) {
+                    Log.d(TAG, "onSuccess: appliance is created  "+ userId);
 
-        new ManualControlDAO(context).deleteAll(userID);
+                }
+            }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    Log.d(TAG, "onFailure:  Category1HomeAppliance " + e.toString());
+                }
+            });
+        }
 
-        DatabaseReference ref = database.getReference("users/" + userID + "/Appliances");
+    }
+    public void getCategory(final String category){
+
+        String path = "users/" + userId + "/appliance/"+category;
+        System.out.println(" ** get path ... "+path);
+        final DatabaseReference ref = database.getReference(path);
+
 
         ref.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
+
                 for (DataSnapshot children : dataSnapshot.getChildren()) {
+                    switch (category){
+                        case "category1":{
+                            Category1HomeAppliance homeAppliance = children.getValue(Category1HomeAppliance.class);
+                            System.out.println(homeAppliance);
+                            new Category1HomeApplianceDAO(context).insert(homeAppliance);
+                            //insert new manualcontrol label with id 0
+                            new ManualControlDAO(context).insertNewLabel(
+                                    homeAppliance.getC_ID(),homeAppliance.getC_LABEL(),homeAppliance.getC_Count()+"",userId);
 
-                    ManualControl hm = children.getValue(ManualControl.class);
-                    System.out.println("***********");
-                    System.out.println(hm.getM_ID());
-                    InsertToLocalDb(hm.getM_ID());
-                    System.out.println("***********");
+                            break;
+                        }
+                        case "category2":{
+                            Category2HomeAppliance homeAppliance = children.getValue(Category2HomeAppliance.class);
+                            System.out.println(homeAppliance);
+                            new Category2HomeApplianceDAO(context).insert(homeAppliance);
+                            //insert manualcontrol with id 0
+                            new ManualControlDAO(context).insertNewLabel(
+                                    homeAppliance.getC2_ID(),homeAppliance.getC2_LABEL(),homeAppliance.getC2_STATUS(),userId);
+
+                            new ScheduleManualCookingDAO(context).insertNewLabel(homeAppliance.getC2_LABEL(),homeAppliance.getC2_STATUS(),userId);
+
+                            break;
+                        }
+                        case "category3":{
+                            Category3HomeAppliance homeAppliance = children.getValue(Category3HomeAppliance.class);
+                            System.out.println(homeAppliance);
+                            try {
+                                new Category3HomeApplianceDAO(context).insert(homeAppliance);
+                                //insert manualcontrol with id 0
+                                new ManualControlDAO(context).insertNewLabel(
+                                        homeAppliance.getC3_ID(), homeAppliance.getC3_LABEL(), homeAppliance.getC3_STATUS_OR_COUNT(), userId);
+
+                                new AutomaticScheduleDAO(context).insertNewLabel(
+                                        homeAppliance.getC3_LABEL(), homeAppliance.getC3_STATUS_OR_COUNT(), userId,homeAppliance.getC3_ID());
+
+                                new ScheduleManualFlexibleLoadsDAO(context).insertNewLabel(
+                                        homeAppliance.getC3_LABEL(), homeAppliance.getC3_STATUS_OR_COUNT(), userId);
+                            }catch (Exception e){
+                                System.out.println("* error in category3 insert to local db "+e.getMessage());
+                            }
+
+                            break;
+                        }
+                    }
+
                 }
 
             }
@@ -67,238 +131,377 @@ public class FirebaseDAO {
             }
         });
 
-
-
-          //new ManualControlDAO(context).getAll(userID);
     }
 
-    private void InsertToLocalDb(final String id) {
+    public void insertCategory2(ArrayList<Category2HomeAppliance> list){
 
-        DatabaseReference ref = database.getReference("users/" + userID + "/Appliances/" + id);
+        for(Category2HomeAppliance appliance : list){
+            //insertCategory1 to firebase
+            mDatabase.child("users").child(userId).child("appliance").child("category2").child(appliance.getC2_ID()+"").setValue(appliance).addOnSuccessListener(new OnSuccessListener<Void>() {
+                @Override
+                public void onSuccess(Void aVoid) {
+                    Log.d(TAG, "onSuccess: appliance is created  "+ userId);
+
+                }
+            }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    Log.d(TAG, "onFailure:  Category2HomeAppliance " + e.toString());
+                }
+            });
+        }
+
+    }
+    public void insertCategory3(ArrayList<Category3HomeAppliance> list){
+
+        System.out.println("* list is "+list);
+        for(Category3HomeAppliance appliance : list){
+            System.out.println(appliance);
+            //insertCategory1 to firebase
+            mDatabase.child("users").child(userId).child("appliance").child("category3").child(appliance.getC3_ID()+"").setValue(appliance).addOnSuccessListener(new OnSuccessListener<Void>() {
+                @Override
+                public void onSuccess(Void aVoid) {
+                    Log.d(TAG, "onSuccess: appliance is created  "+ userId);
+
+                }
+            }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    Log.d(TAG, "onFailure:  Category3HomeAppliance " + e.toString());
+                }
+            });
+        }
+
+    }
+
+
+
+    public void insertManualControl(ArrayList<ManualControl> list){
+
+        System.out.println("* list is "+list);
+        for(ManualControl element : list){
+            System.out.println(element);
+            //insertCategory1 to firebase
+            mDatabase.child("users").child(userId).child("manualControl").child(element.getM_ID()).setValue(element).addOnSuccessListener(new OnSuccessListener<Void>() {
+                @Override
+                public void onSuccess(Void aVoid) {
+                    Log.d(TAG, "onSuccess: ManualControl is created  "+ userId);
+
+                }
+            }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    Log.d(TAG, "onFailure:  ManualControl " + e.toString());
+                }
+            });
+        }
+
+    }
+
+    public void getManualControl(){
+
+        String path = "users/" + userId + "/manualControl";
+        System.out.println(" ** get path ... "+path);
+        final DatabaseReference ref = database.getReference(path);
+
 
         ref.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
 
-                System.out.println(dataSnapshot.getValue(ManualControl.class));
-                ManualControl hm = dataSnapshot.getValue(ManualControl.class);
-                if (Objects.requireNonNull(dataSnapshot).exists()) {
-//
-//                    new ManualControlDAO(context).insert(id, userID,
-//                            hm.getM_LABEL(),
-//                            hm.getM__STATUS()
-//                    );
+                for (DataSnapshot children : dataSnapshot.getChildren()) {
+                    ManualControl mcontrol = children.getValue(ManualControl.class);
+                    System.out.println(mcontrol);
+                    if(mcontrol != null){
+                        new ManualControlDAO(context).insert(mcontrol);
+                    }
 
-                } else {
-                    Log.d("tag", "onEvent: Document do not exists");
                 }
+
             }
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-                System.out.println("The read failed: " + databaseError.getCode());
+                System.out.println("The ManualControl read failed: " + databaseError.getCode());
             }
         });
 
     }
 
 
-    //############################### CHECK Active ##############################
 
-    public String checkActive() {
-       /* userID = (fAuth.getCurrentUser()!= null)? fAuth.getCurrentUser().getUid():"0";
-        final String[] isActive = new String[1];
-        DatabaseReference ref = database.getReference("users/"+userID +"/profile");
+
+    public void insertAutomaicSchedule(ArrayList<AutomaticSchedule> list){
+
+        System.out.println("* list is "+list);
+        for(AutomaticSchedule element : list){
+            System.out.println(element);
+
+            //insertCategory1 to firebase
+            mDatabase.child("users").child(userId).child("automaticSchedule").child(element.getA_ID()+"").setValue(element).addOnSuccessListener(new OnSuccessListener<Void>() {
+                @Override
+                public void onSuccess(Void aVoid) {
+                    Log.d(TAG, "onSuccess: AutomaicSchedule  is created  "+ userId);
+
+                }
+            }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    Log.d(TAG, "onFailure:  insertAutomaicSchedule " + e.toString());
+                }
+            });
+        }
+
+    }
+
+    public void getAutomaicSchedule(){
+
+        String path = "users/" + userId + "/automaticSchedule";
+        System.out.println(" ** get path ... "+path);
+        final DatabaseReference ref = database.getReference(path);
+
 
         ref.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                // Post post = dataSnapshot.getValue(Post.class);
-                if(dataSnapshot.exists()){
 
-                    Profile prof = dataSnapshot.getValue(Profile.class);
-                    System.out.println(prof);
-                    isActive[0] ="true";//prof.getIsActive();//dataSnapshot.getValue().toString();
+                for (DataSnapshot children : dataSnapshot.getChildren()) {
+                    AutomaticSchedule automaticSchedule = children.getValue(AutomaticSchedule.class);
+                    System.out.println(automaticSchedule);
+                    if(automaticSchedule != null) {
+                        new AutomaticScheduleDAO(context).insert(automaticSchedule);
+                    }
 
-                }else{
-                    isActive[0] = "false";
-                    Log.d("tag", "onEvent: Document do not exists");
                 }
+
             }
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-                System.out.println("The read failed: " + databaseError.getCode());
-            }
-        });
-        System.out.println(isActive[0]);
-        if(isActive[0]==null){
-            isActive[0] = "false";
-        }
-        return isActive[0];*/
-        return "true";
-    }
-    //############################### INSERT ##############################
-//
-//    public int insertToFirebase(final String label_name) {
-//
-//        userID = (fAuth.getCurrentUser() != null) ? fAuth.getCurrentUser().getUid() : "0";
-//        new ManualControlDAO(context).insert(label_name, userID);
-//        final int[] h_id = {0};
-//        final int[] id = {2};
-//        //insertToLocalDb
-//
-//        DatabaseReference ref = database.getReference("users/" + userID + "/Appliances");
-//
-//        ref.addValueEventListener(new ValueEventListener() {
-//
-//
-//            @Override
-//            public void onDataChange(DataSnapshot dataSnapshot) {
-//
-//                List<Integer> list = new ArrayList<>();
-//                int max = 0;
-//                boolean isDuplicate = false;
-//                if (Objects.requireNonNull(dataSnapshot).exists()) {
-//                    for (DataSnapshot children : dataSnapshot.getChildren()) {
-//
-//
-//                        ManualControl hm = children.getValue(ManualControl.class);
-//                        System.out.println(label_name);
-//                        System.out.println(hm);
-//                        int id = Integer.parseInt(hm.getM_ID());
-//                        if (max < id) {
-//                            max = id;
-//                            list.clear();
-//                            list.add(max + 1);
-//                        }
-//                        if (hm.getM_LABEL().equals(label_name)) {
-//                            isDuplicate = true;
-//                            break;
-//                        }
-//                        Log.d(TAG, "max " + hm.getM_ID());
-//                    }
-//                    System.out.println("Before insertCategory1 Data " + isDuplicate);
-//                    if (!isDuplicate) {
-//                        id[0] = insertData(list.get(0), label_name);
-//                        Log.d(TAG, list.toString());
-//                    }
-//
-//                } else {
-//                    Log.d("tag", "onEvent: Document do not exists insertToFirebase");
-//                }
-//            }
-//
-//            @Override
-//            public void onCancelled(DatabaseError databaseError) {
-//                System.out.println("The insertToFirebase read failed: " + databaseError.getCode());
-//            }
-//        });
-//        return id[0];
-//
-//    }
-
-    private int insertData(final int newID, final String label_name) {
-
-        System.out.println("insertData");
-        DatabaseReference ref = database.getReference();
-
-
-        Map<String, Object> appliance1 = new HashMap<>();
-        appliance1.put("M_ID", newID + "");
-        appliance1.put("M_LABEL", label_name);
-        appliance1.put("T_5_TO_8", "0");
-        appliance1.put("T_8_TO_17", "0");
-        appliance1.put("T_17_TO_22", "0");
-        appliance1.put("T_22_TO_5", "0");
-        appliance1.put("M_STATUS", "0");
-
-        ref.child("users").child(userID).child("Appliances").child(newID + "").setValue(appliance1);
-        //new ManualControlDAO(context).insert(label_name, newID + "", userID);
-
-        return newID;
-    }
-
-
-    //############################### UPDATE ################
-    public void UpdateManualControlToFirebase(final String h_id, final String m__status) {
-        userID = (fAuth.getCurrentUser() != null) ? fAuth.getCurrentUser().getUid() : "0";
-        // DocumentReference docRef = fStore.collection("users").document(userID).collection("Appliances").document(h_id);
-        DatabaseReference ref = database.getReference("users/" + userID + "/Appliances/" + h_id + "/M_STATUS");
-
-        Map<String, Object> edited = new HashMap<>();
-
-        edited.put("M_STATUS", m__status);
-        ref.setValue(m__status).onSuccessTask(new SuccessContinuation<Void, Object>() {
-            @NonNull
-            @Override
-            public Task<Object> then(@Nullable Void aVoid) throws Exception {
-               // new ManualControlDAO(context).updateManualControl(h_id, m__status, userID);
-                return null;
+                System.out.println("The AutomaicSchedule  read failed: " + databaseError.getCode());
             }
         });
 
     }
 
-    public void UpdateTimeToFirebase(final int place_id, final String h_id, final String status) {
-
-        userID = (fAuth.getCurrentUser() != null) ? fAuth.getCurrentUser().getUid() : "0";
-        DatabaseReference ref = database.getReference();
 
 
-        Map<String, Object> edited = new HashMap<>();
+    public void insertScheduleCooking(ArrayList<ScheduleManual> list){
 
+        System.out.println("* list is "+list);
+        for(ScheduleManual element : list){
+            System.out.println(element);
 
-        switch (place_id) {
-            case 1: {
-                edited.put("T_5_TO_8", status);
-                ref = database.getReference("users/" + userID + "/Appliances/" + h_id + "/T_5_TO_8");
-            }
-            break;
-            case 2: {
-                edited.put("T_8_TO_17", status);
-                ref = database.getReference("users/" + userID + "/Appliances/" + h_id + "/T_8_TO_17");
-            }
-            break;
-            case 3: {
-                edited.put("T_17_TO_22", status);
-                ref = database.getReference("users/" + userID + "/Appliances/" + h_id + "/T_17_TO_22");
-            }
-            break;
-            case 4: {
-                edited.put("T_22_TO_5", status);
-                ref = database.getReference("users/" + userID + "/Appliances/" + h_id + "/T_22_TO_5");
-            }
-            break;
+            //insertCategory1 to firebase
+            mDatabase.child("users").child(userId).child("ScheduleCooking").child(element.getS_ID()+"").setValue(element).addOnSuccessListener(new OnSuccessListener<Void>() {
+                @Override
+                public void onSuccess(Void aVoid) {
+                    Log.d(TAG, "onSuccess: AutomaicSchedule  is created  "+ userId);
+
+                }
+            }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    Log.d(TAG, "onFailure:  insertAutomaicSchedule " + e.toString());
+                }
+            });
         }
 
-        ref.setValue(status).onSuccessTask(new SuccessContinuation<Void, Object>() {
+    }
+
+    public void getScheduleCooking(){
+
+        String path = "users/" + userId + "/ScheduleCooking";
+        System.out.println(" ** get path ... "+path);
+        final DatabaseReference ref = database.getReference(path);
+
+
+        ref.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+
+                for (DataSnapshot children : dataSnapshot.getChildren()) {
+                    ScheduleManual scheduleManual = children.getValue(ScheduleManual.class);
+                    System.out.println(scheduleManual);
+                    if(scheduleManual != null) {
+                        new ScheduleManualCookingDAO(context).insert(scheduleManual);
+                    }
+
+                }
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                System.out.println("The AutomaicSchedule  read failed: " + databaseError.getCode());
+            }
+        });
+
+    }
+
+    public void insertScheduleFlexibleLoads(ArrayList<ScheduleManual> list){
+
+        System.out.println("* list is "+list);
+        for(ScheduleManual element : list){
+            System.out.println(element);
+
+            //insertCategory1 to firebase
+            mDatabase.child("users").child(userId).child("ScheduleFlexibleLoads").child(element.getS_ID()+"").setValue(element).addOnSuccessListener(new OnSuccessListener<Void>() {
+                @Override
+                public void onSuccess(Void aVoid) {
+                    Log.d(TAG, "onSuccess: AutomaicSchedule  is created  "+ userId);
+
+                }
+            }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    Log.d(TAG, "onFailure:  insertAutomaicSchedule " + e.toString());
+                }
+            });
+        }
+
+    }
+
+    public void getScheduleFlexibleLoads(){
+
+        String path = "users/" + userId + "/ScheduleFlexibleLoads";
+        System.out.println(" ** get path ... "+path);
+        final DatabaseReference ref = database.getReference(path);
+
+
+        ref.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+
+                for (DataSnapshot children : dataSnapshot.getChildren()) {
+                    ScheduleManual scheduleManual = children.getValue(ScheduleManual.class);
+                    System.out.println(scheduleManual);
+                    if(scheduleManual != null) {
+                        new ScheduleManualFlexibleLoadsDAO(context).insert(scheduleManual);
+                    }
+
+                }
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                System.out.println("The AutomaicSchedule  read failed: " + databaseError.getCode());
+            }
+        });
+    }
+
+    //##################### STATUS #################################################333
+
+    public void insertAutomaticScheduleStatus(AllStatus allStatus){
+
+        System.out.println("* list is "+allStatus);
+        mDatabase.child("users").child(userId).child("automaticScheduleStatus").setValue(allStatus.getALL_STATUS()).addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void aVoid) {
+                Log.d(TAG, "onSuccess: AutomaicSchedule  is created  "+ userId);
+
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Log.d(TAG, "onFailure:  insertAutomaicSchedule " + e.toString());
+            }
+        });
+
+    }
+
+    public void getAutomaticScheduleStatus(){
+
+        String path = "users/" + userId + "/automaticScheduleStatus";
+        System.out.println(" ** get path ... "+path);
+        final DatabaseReference ref = database.getReference(path);
+
+
+        ref.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                try {
+                    System.out.println(dataSnapshot);
+                    String sts = dataSnapshot.getValue().toString();
+                    new AllStatusDAO(context).insert(new AllStatus(1,userId, "automaticSchedule", dataSnapshot.getValue().toString()));
+                }catch (Exception e){
+                    System.out.println("Error in getAutomaticScheduleStatus");
+                    e.printStackTrace();
+                }
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                System.out.println("The AutomaicSchedule  read failed: " + databaseError.getCode());
+            }
+        });
+
+    }
+    public void insertManualControlStatus(AllStatus allStatus){
+
+        System.out.println("* list is "+allStatus);
+        mDatabase.child("users").child(userId).child("manualControlStatus").setValue(allStatus.getALL_STATUS()).addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void aVoid) {
+                Log.d(TAG, "onSuccess: insertManualControlStatus  is created  "+ userId);
+
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Log.d(TAG, "onFailure:  insertManualControlStatus " + e.toString());
+            }
+        });
+
+    }
+    public void getManualControlStatus(){
+
+        String path = "users/" + userId + "/manualControlStatus";
+        System.out.println(" ** get path ... "+path);
+        final DatabaseReference ref = database.getReference(path);
+
+
+        ref.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+
+                try {
+                    System.out.println(dataSnapshot);
+                    String sts = dataSnapshot.getValue().toString();
+                    new AllStatusDAO(context).insert(new AllStatus(2,userId, "manualControl", dataSnapshot.getValue().toString()));
+                }catch (Exception e){
+                    System.out.println("Error in getManualControlStatus");
+                    e.printStackTrace();
+                }
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                System.out.println("The ManualControl status read failed: " + databaseError.getCode());
+            }
+        });
+
+    }
+
+    //########################################## DELETE #############################33
+    public void deleteFromFirebase(final String path, final String id) {
+
+        userId = (fAuth.getCurrentUser() != null) ? fAuth.getCurrentUser().getUid() : "0";
+
+
+        DatabaseReference ref = database.getReference(path);
+        ref.child(id).removeValue().onSuccessTask(new SuccessContinuation<Void, Object>() {
             @NonNull
             @Override
             public Task<Object> then(@Nullable Void aVoid) throws Exception {
-              //  new ManualControlDAO(context).updateTime(place_id, h_id, status, userID);
+                System.out.println("* delete success "+path +" : "+ id);
                 return null;
             }
         });
 
-
     }
 
-    ///############################ DELETE ##################
-
-    public void deleteFirebaseHomeAppliance(final String h_id) {
-
-        userID = (fAuth.getCurrentUser() != null) ? fAuth.getCurrentUser().getUid() : "0";
-        new ManualControlDAO(context).deleteHomeAppliance(h_id + "", userID);
-        DatabaseReference ref = database.getReference("users/" + userID + "/Appliances");
-        ref.child(h_id).removeValue().onSuccessTask(new SuccessContinuation<Void, Object>() {
-            @NonNull
-            @Override
-            public Task<Object> then(@Nullable Void aVoid) throws Exception {
-                new ManualControlDAO(context).deleteHomeAppliance(h_id + "", userID);
-                return null;
-            }
-        });
-
-    }
 }

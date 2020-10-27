@@ -97,8 +97,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String A_LABEL = "a_label_name";
     public static final String A_CATEGORY_ID = "a_category_id";
     public static final String A_STATUS  =  "a_status";
-    public static final String A_START_TIME  =  "a_start_time";
-    public static final String A_END_TIME  =  "a_end_time";
+    public static final String A_START_TIME_HOUR  =  "a_start_time_hour";
+    public static final String A_START_TIME_MINUTE  =  "a_start_time_minute";
+    public static final String A_END_TIME_HOUR  =  "a_end_time_hour";
+    public static final String A_END_TIME_MINUTE  =  "a_end_time_minute";
 
 
     //TABLE CREATING STRING
@@ -107,8 +109,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             + A_USER_ID + " TEXT, "
             + A_LABEL + " TEXT, "
             + A_CATEGORY_ID + " TEXT, "
-            + A_START_TIME + " TEXT, "
-            + A_END_TIME + " TEXT, "
+            + A_START_TIME_HOUR + " TEXT, "
+            + A_START_TIME_MINUTE + " TEXT, "
+            + A_END_TIME_HOUR + " TEXT, "
+            + A_END_TIME_MINUTE + " TEXT, "
             + A_STATUS + " TEXT ); ";
 
  //#################### SCHEDULE MANUAL COOKING TABLE ######################
@@ -119,8 +123,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String S_ID = "s_Id";
     public static final String S_USER_ID = "s_user_id";
     public static final String S_LABEL = "s_label_name";
-    public static final String S_Start_Time  =  "s_start_time";
-    public static final String S_End_Time  =  "s_end_time";
+    public static final String S_Start_Time_Hour  =  "s_start_time_hour";
+    public static final String S_Start_Time_Minute  =  "s_start_time_minute";
+    public static final String S_End_Time_Hour  =  "s_end_time_hour";
+    public static final String S_End_Time_Minute  =  "s_end_time_minute";
 
 
     //TABLE CREATING STRING
@@ -128,8 +134,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             + S_ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
             + S_USER_ID + " TEXT, "
             + S_LABEL + " TEXT, "
-            + S_Start_Time + " TEXT, "
-            + S_End_Time + " TEXT ); ";
+            + S_Start_Time_Hour + " TEXT, "
+            + S_Start_Time_Minute + " TEXT, "
+            + S_End_Time_Hour + " TEXT, "
+            + S_End_Time_Minute + " TEXT ); ";
 
     //#################### SCHEDULE MANUAL FLEXIBLE LOADS TABLE ######################
 
@@ -139,8 +147,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String F_ID = "f_Id";
     public static final String F_USER_ID = "f_user_id";
     public static final String F_LABEL = "f_label_name";
-    public static final String F_Start_Time  =  "f_start_time";
-    public static final String F_End_Time  =  "f_end_time";
+    public static final String F_Start_Time_Hour  =  "f_start_time_hour";
+    public static final String F_Start_Time_Minute  =  "f_start_time_minute";
+    public static final String F_End_Time_Hour  =  "f_end_time_hour";
+    public static final String F_End_Time_Minute  =  "f_end_time_minute";
 
 
     //TABLE CREATING STRING
@@ -148,8 +158,28 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             + F_ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
             + F_USER_ID + " TEXT, "
             + F_LABEL + " TEXT, "
-            + F_Start_Time + " TEXT, "
-            + F_End_Time + " TEXT ); ";
+            + F_Start_Time_Hour + " TEXT, "
+            + F_Start_Time_Minute + " TEXT, "
+            + F_End_Time_Hour + " TEXT, "
+            + F_End_Time_Minute + " TEXT ); ";
+
+    //#################### ALL STATUS TABLE ######################
+
+    // TABLE
+    public static final String TABLE_ALL_STATUS = "table_all_status";
+    // TABLE ATTRIBUTES
+    public static final String ALL_ID = "all_id";
+    public static final String ALL_USER_ID = "all_user_id";
+    public static final String ALL_LABEL = "all_label";
+    public static final String ALL_STATUS  =  "all_status";
+
+
+    //TABLE CREATING STRING
+    private static final String CREATE_TABLE_ALL_STATUS = "CREATE  TABLE IF NOT EXISTS " + TABLE_ALL_STATUS + " ("
+            + ALL_ID + " INTEGER PRIMARY KEY,"
+            + ALL_USER_ID + " TEXT, "
+            + ALL_LABEL + " TEXT, "
+            + ALL_STATUS + " TEXT ); ";
 
 
     @Override
@@ -162,6 +192,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL(CREATE_TABLE_SCHEDULE_AUTOMATIC);
         db.execSQL(CREATE_TABLE_SCHEDULE_MANUAL_COOKING);
         db.execSQL(CREATE_TABLE_SCHEDULE_MANUAL_FLEXIBLE_LOADS);
+        db.execSQL(CREATE_TABLE_ALL_STATUS);
+
+
+
 
     }
 

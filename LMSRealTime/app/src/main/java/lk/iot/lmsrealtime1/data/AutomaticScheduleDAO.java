@@ -70,8 +70,10 @@ public class AutomaticScheduleDAO {
                 values.put(dbHelper.A_STATUS, automaticSchedule.getA_STATUS());
                 values.put(dbHelper.A_USER_ID, automaticSchedule.getA_USER_ID());
                 values.put(dbHelper.A_CATEGORY_ID, automaticSchedule.getA_CATEGORY_ID());
-                values.put(dbHelper.A_START_TIME,"06:00");
-                values.put(dbHelper.A_END_TIME,"22:00");
+                values.put(dbHelper.A_START_TIME_HOUR,"06");
+                values.put(dbHelper.A_START_TIME_MINUTE,"00");
+                values.put(dbHelper.A_END_TIME_HOUR,"22");
+                values.put(dbHelper.A_END_TIME_MINUTE,"00");
 
 
                 count = (int) dB.insert(dbHelper.TABLE_SCHEDULE_AUTOMATIC, null, values);
@@ -87,8 +89,10 @@ public class AutomaticScheduleDAO {
                 values.put(dbHelper.A_STATUS, automaticSchedule.getA_STATUS());
                 values.put(dbHelper.A_USER_ID, automaticSchedule.getA_USER_ID());
                 values.put(dbHelper.A_CATEGORY_ID, automaticSchedule.getA_CATEGORY_ID());
-                values.put(dbHelper.A_START_TIME,"06:00");
-                values.put(dbHelper.A_END_TIME,"22:00");
+                values.put(dbHelper.A_START_TIME_HOUR,"06");
+                values.put(dbHelper.A_START_TIME_MINUTE,"00");
+                values.put(dbHelper.A_END_TIME_HOUR,"22");
+                values.put(dbHelper.A_END_TIME_MINUTE,"00");
 
 
                 count = dB.update(dbHelper.TABLE_SCHEDULE_AUTOMATIC, values, dbHelper.A_ID + " =?", new String[]{automaticSchedule.getA_ID()+"" });
@@ -140,8 +144,10 @@ public class AutomaticScheduleDAO {
                 values.put(dbHelper.A_USER_ID, userId);
                 values.put(dbHelper.A_CATEGORY_ID, category_id);
                 values.put(dbHelper.A_STATUS,"0");
-                values.put(dbHelper.A_START_TIME,"06:00");
-                values.put(dbHelper.A_END_TIME,"22:00");
+                values.put(dbHelper.A_START_TIME_HOUR,"06");
+                values.put(dbHelper.A_START_TIME_MINUTE,"00");
+                values.put(dbHelper.A_END_TIME_HOUR,"22");
+                values.put(dbHelper.A_END_TIME_MINUTE,"00");
 
 
                 count = (int) dB.insert(dbHelper.TABLE_SCHEDULE_AUTOMATIC, null, values);
@@ -234,8 +240,10 @@ public class AutomaticScheduleDAO {
                 h.setA_STATUS(cur.getString(cur.getColumnIndex(dbHelper.A_STATUS)));
                 h.setA_USER_ID(cur.getString(cur.getColumnIndex(dbHelper.A_USER_ID)));
                 h.setA_CATEGORY_ID(cur.getString(cur.getColumnIndex(dbHelper.A_CATEGORY_ID)));
-                h.setA_START_TIME(cur.getString(cur.getColumnIndex(dbHelper.A_START_TIME)));
-                h.setA_END_TIME(cur.getString(cur.getColumnIndex(dbHelper.A_END_TIME)));
+                h.setA_START_TIME_HOUR(cur.getString(cur.getColumnIndex(dbHelper.A_START_TIME_HOUR)));
+                h.setA_START_TIME_MINUTE(cur.getString(cur.getColumnIndex(dbHelper.A_START_TIME_MINUTE)));
+                h.setA_END_TIME_HOUR(cur.getString(cur.getColumnIndex(dbHelper.A_END_TIME_HOUR)));
+                h.setA_END_TIME_MINUTE(cur.getString(cur.getColumnIndex(dbHelper.A_END_TIME_MINUTE)));
                 list.add(h);
             }
 
@@ -273,8 +281,10 @@ public class AutomaticScheduleDAO {
                 h.setA_STATUS(cur.getString(cur.getColumnIndex(dbHelper.A_STATUS)));
                 h.setA_USER_ID(cur.getString(cur.getColumnIndex(dbHelper.A_USER_ID)));
                 h.setA_CATEGORY_ID(cur.getString(cur.getColumnIndex(dbHelper.A_CATEGORY_ID)));
-                h.setA_START_TIME(cur.getString(cur.getColumnIndex(dbHelper.A_START_TIME)));
-                h.setA_END_TIME(cur.getString(cur.getColumnIndex(dbHelper.A_END_TIME)));
+                h.setA_START_TIME_HOUR(cur.getString(cur.getColumnIndex(dbHelper.A_START_TIME_HOUR)));
+                h.setA_START_TIME_MINUTE(cur.getString(cur.getColumnIndex(dbHelper.A_START_TIME_MINUTE)));
+                h.setA_END_TIME_HOUR(cur.getString(cur.getColumnIndex(dbHelper.A_END_TIME_HOUR)));
+                h.setA_END_TIME_MINUTE(cur.getString(cur.getColumnIndex(dbHelper.A_END_TIME_MINUTE)));
                 list.add(h);
             }
 

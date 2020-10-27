@@ -8,9 +8,7 @@ import android.view.Gravity;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -38,8 +36,7 @@ import java.util.ArrayList;
 
 import lk.iot.lmsrealtime1.R;
 import lk.iot.lmsrealtime1.adapter.MenuAdapter;
-import lk.iot.lmsrealtime1.data.Firebase1DAO;
-import lk.iot.lmsrealtime1.data.ManualControlDAO;
+import lk.iot.lmsrealtime1.data.FirebaseDAO;
 import lk.iot.lmsrealtime1.model.MyMenu;
 public class MainActivity extends AppCompatActivity {
 
@@ -62,8 +59,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         mToolBar =  findViewById( R.id.tb_main );
         progressBar =  findViewById( R.id.progressBar );
-        mToolBar.setTitle( "Home" );
-        mToolBar.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
+
         fAuth = FirebaseAuth.getInstance();
         //fStore = FirebaseFirestore.getInstance();
         userID = (fAuth.getCurrentUser()!= null)? fAuth.getCurrentUser().getUid():"0";
@@ -103,11 +99,11 @@ public class MainActivity extends AppCompatActivity {
     void downloadFromFirebase(){
 
         progressBar.setVisibility(View.VISIBLE);
-        new Firebase1DAO(MainActivity.this).getCategory("category1");
-        new Firebase1DAO(MainActivity.this).getCategory("category2");
-        new Firebase1DAO(MainActivity.this).getCategory("category3");
-       // new Firebase1DAO(MainActivity.this).getManualControl();
-       // new Firebase1DAO(MainActivity.this).getAutomaicSchedule();
+        new FirebaseDAO(MainActivity.this).getCategory("category1");
+        new FirebaseDAO(MainActivity.this).getCategory("category2");
+        new FirebaseDAO(MainActivity.this).getCategory("category3");
+       // new FirebaseDAO(MainActivity.this).getManualControl();
+       // new FirebaseDAO(MainActivity.this).getAutomaicSchedule();
 
         new Handler().postDelayed(new Runnable() {
             public void run() {

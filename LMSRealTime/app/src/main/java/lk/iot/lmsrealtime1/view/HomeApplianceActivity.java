@@ -8,7 +8,7 @@ import android.widget.Button;
 import androidx.appcompat.app.AppCompatActivity;
 
 import lk.iot.lmsrealtime1.R;
-import lk.iot.lmsrealtime1.data.Firebase1DAO;
+import lk.iot.lmsrealtime1.data.FirebaseDAO;
 
 public class HomeApplianceActivity extends AppCompatActivity {
 
@@ -55,10 +55,10 @@ public class HomeApplianceActivity extends AppCompatActivity {
     }
 
     void downloadFromFirebase(){
-        new Firebase1DAO(HomeApplianceActivity.this).getCategory("category1");
-        new Firebase1DAO(HomeApplianceActivity.this).getCategory("category2");
-        new Firebase1DAO(HomeApplianceActivity.this).getCategory("category3");
-        //new Firebase1DAO(HomeApplianceActivity.this).getManualControl();
+        new FirebaseDAO(HomeApplianceActivity.this).getCategory("category1");
+        new FirebaseDAO(HomeApplianceActivity.this).getCategory("category2");
+        new FirebaseDAO(HomeApplianceActivity.this).getCategory("category3");
+        //new FirebaseDAO(HomeApplianceActivity.this).getManualControl();
 
 
     }

@@ -34,7 +34,7 @@ import java.util.Map;
 
 import lk.iot.lmsrealtime1.R;
 import lk.iot.lmsrealtime1.adapter.ScheduleManualAdapter;
-import lk.iot.lmsrealtime1.data.Firebase1DAO;
+import lk.iot.lmsrealtime1.data.FirebaseDAO;
 import lk.iot.lmsrealtime1.data.ScheduleManualFlexibleLoadsDAO;
 import lk.iot.lmsrealtime1.helper.ClickListener;
 import lk.iot.lmsrealtime1.helper.TimePickerFragment;
@@ -90,8 +90,8 @@ public class ScheduleManualFlexibleLoadsActivity extends AppCompatActivity {
                     TimePickerDialog.OnTimeSetListener listener = new TimePickerDialog.OnTimeSetListener() {
                         @Override
                         public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-
-                            mn.setS_End_Time(getTwoValue(hourOfDay) + ":" + getTwoValue(minute));
+                            mn.setS_End_Time_Hour(getTwoValue(hourOfDay));
+                            mn.setS_End_Time_Minute(getTwoValue(minute));
 
                             tex.setText(getTwoValue(hourOfDay) + ":" + getTwoValue(minute));
                         }
@@ -105,8 +105,8 @@ public class ScheduleManualFlexibleLoadsActivity extends AppCompatActivity {
                     TimePickerDialog.OnTimeSetListener listener = new TimePickerDialog.OnTimeSetListener() {
                         @Override
                         public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-
-                            mn.setS_Start_Time(getTwoValue(hourOfDay) + ":" + getTwoValue(minute));
+                            mn.setS_Start_Time_Hour(getTwoValue(hourOfDay));
+                            mn.setS_Start_Time_Minute(getTwoValue(minute));
 
                             tex.setText(getTwoValue(hourOfDay) + ":" + getTwoValue(minute));
                         }
@@ -155,18 +155,12 @@ public class ScheduleManualFlexibleLoadsActivity extends AppCompatActivity {
                 }
                 ArrayList<ScheduleManual> allData = new ScheduleManualFlexibleLoadsDAO(ScheduleManualFlexibleLoadsActivity.this).getAll(userID);
 
-                new Firebase1DAO(ScheduleManualFlexibleLoadsActivity.this).insertScheduleFlexibleLoads(allData);
+                new FirebaseDAO(ScheduleManualFlexibleLoadsActivity.this).insertScheduleFlexibleLoads(allData);
 
                 for(ScheduleManual scheduleManual:allData){
-/* case "washing machine":{
-                StartTimeList.put(label,0.0);
-                cost = getAllUsedHoursCost(250,startTime,endTime,label)*0.25;
-            }
-            break;
-            case "water pump":{*/
                     if(scheduleManual.getS_LABEL().equalsIgnoreCase("washing machine") || scheduleManual.getS_LABEL().equalsIgnoreCase("water pump")) {
 
-                        double val = Calculation(scheduleManual.getS_LABEL(),scheduleManual.getS_Start_Time(),scheduleManual.getS_End_Time());
+                        double val = Calculation(scheduleManual.getS_LABEL(),scheduleManual.getS_Start_Time_Hour()+":"+scheduleManual.getS_Start_Time_Minute(),scheduleManual.getS_End_Time_Hour()+":"+scheduleManual.getS_End_Time_Minute());
                         System.out.println(val/60.0);
 
                         BigDecimal b = new BigDecimal(StartTimeList.get(scheduleManual.getS_LABEL()));
@@ -177,14 +171,14 @@ public class ScheduleManualFlexibleLoadsActivity extends AppCompatActivity {
                     }
                 }
                 int num = 0;
-                String message = " Power usage status for  \n";
+                String message = " Power usage status for ";
                 if(StartTimeList.get("Water Pump") != null){
                     num++;
-                    message += "Water Pump : Rs."+StartTimeList.get("Water Pump");
+                    message += " \nWater Pump : Rs."+StartTimeList.get("Water Pump");
                 }
                 if(StartTimeList.get("Washing Machine") != null){
                     num++;
-                    message += "Washing Machine : Rs."+StartTimeList.get("Washing Machine");
+                    message += "\nWashing Machine : Rs."+StartTimeList.get("Washing Machine");
                 }
 
                 final int finalCount = count;
@@ -219,7 +213,7 @@ public class ScheduleManualFlexibleLoadsActivity extends AppCompatActivity {
     }
 
     void downloadData() {
-        new Firebase1DAO(ScheduleManualFlexibleLoadsActivity.this).getScheduleFlexibleLoads();
+        new FirebaseDAO(ScheduleManualFlexibleLoadsActivity.this).getScheduleFlexibleLoads();
         list = new ScheduleManualFlexibleLoadsDAO(ScheduleManualFlexibleLoadsActivity.this).getAll(userID);
 
     }

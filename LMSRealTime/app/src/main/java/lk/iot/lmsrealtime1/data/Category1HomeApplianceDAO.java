@@ -20,7 +20,7 @@ public class Category1HomeApplianceDAO {
     private DatabaseHelper dbHelper;
     Context context;
     FirebaseAuth fAuth;
-   // FirebaseFirestore fStore;
+    // FirebaseFirestore fStore;
     String userID;
     public static final String TAG = "TAG";
 
@@ -28,7 +28,7 @@ public class Category1HomeApplianceDAO {
         this.context = context;
         dbHelper = new DatabaseHelper(context);
         fAuth = FirebaseAuth.getInstance();
-     //   fStore = FirebaseFirestore.getInstance();
+        //   fStore = FirebaseFirestore.getInstance();
     }
 
     public void open() throws SQLException{
@@ -138,7 +138,7 @@ public class Category1HomeApplianceDAO {
             }
 
         }catch (Exception e) {
-           e.printStackTrace();
+            e.printStackTrace();
         }finally {
             dB.close();
         }

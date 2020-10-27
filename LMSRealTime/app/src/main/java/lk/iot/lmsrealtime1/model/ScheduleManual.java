@@ -5,17 +5,22 @@ public class ScheduleManual {
     private int S_ID;
     private String S_USER_ID;
     private String S_LABEL;
-    private String S_Start_Time;
-    private String S_End_Time;
+    private String S_Start_Time_Hour;
+    private String S_Start_Time_Minute;
+    private String S_End_Time_Hour;
+    private String S_End_Time_Minute;
 
     public ScheduleManual() {
     }
 
-    public ScheduleManual(String s_USER_ID, String s_LABEL, String s_STATUS, String s_Start_Time, String s_End_Time) {
+
+    public ScheduleManual(String s_USER_ID, String s_LABEL, String s_Start_Time_Hour, String s_Start_Time_Minute, String s_End_Time_Hour, String s_End_Time_Minute) {
         S_USER_ID = s_USER_ID;
         S_LABEL = s_LABEL;
-        S_Start_Time = s_Start_Time;
-        S_End_Time = s_End_Time;
+        S_Start_Time_Hour = s_Start_Time_Hour;
+        S_Start_Time_Minute = s_Start_Time_Minute;
+        S_End_Time_Hour = s_End_Time_Hour;
+        S_End_Time_Minute = s_End_Time_Minute;
     }
 
     public int getS_ID() {
@@ -42,22 +47,36 @@ public class ScheduleManual {
         S_LABEL = s_LABEL;
     }
 
-
-
-    public String getS_Start_Time() {
-        return S_Start_Time;
+    public String getS_Start_Time_Hour() {
+        return S_Start_Time_Hour;
     }
 
-    public void setS_Start_Time(String s_Start_Time) {
-        S_Start_Time = s_Start_Time;
+    public void setS_Start_Time_Hour(String s_Start_Time_Hour) {
+        S_Start_Time_Hour = s_Start_Time_Hour;
     }
 
-    public String getS_End_Time() {
-        return S_End_Time;
+    public String getS_Start_Time_Minute() {
+        return S_Start_Time_Minute;
     }
 
-    public void setS_End_Time(String s_End_Time) {
-        S_End_Time = s_End_Time;
+    public void setS_Start_Time_Minute(String s_Start_Time_Minute) {
+        S_Start_Time_Minute = s_Start_Time_Minute;
+    }
+
+    public String getS_End_Time_Hour() {
+        return S_End_Time_Hour;
+    }
+
+    public void setS_End_Time_Hour(String s_End_Time_Hour) {
+        S_End_Time_Hour = s_End_Time_Hour;
+    }
+
+    public String getS_End_Time_Minute() {
+        return S_End_Time_Minute;
+    }
+
+    public void setS_End_Time_Minute(String s_End_Time_Minute) {
+        S_End_Time_Minute = s_End_Time_Minute;
     }
 
     @Override
@@ -66,8 +85,10 @@ public class ScheduleManual {
                 "S_ID=" + S_ID +
                 ", S_USER_ID='" + S_USER_ID + '\'' +
                 ", S_LABEL='" + S_LABEL + '\'' +
-                ", S_Start_Time='" + S_Start_Time + '\'' +
-                ", S_End_Time='" + S_End_Time + '\'' +
+                ", S_Start_Time_Hour='" + S_Start_Time_Hour + '\'' +
+                ", S_Start_Time_Minute='" + S_Start_Time_Minute + '\'' +
+                ", S_End_Time_Hour='" + S_End_Time_Hour + '\'' +
+                ", S_End_Time_Minute='" + S_End_Time_Minute + '\'' +
                 '}';
     }
 }
