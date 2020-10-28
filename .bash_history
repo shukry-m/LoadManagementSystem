@@ -14,3 +14,17 @@ git add .
 git status
 git commit -m "Final App"
 git push -u origin main
+ls
+git status
+git diff  LMSRealTime/app/src/main/java/lk/iot/lmsrealtime1/data/FirebaseDAO.java
+git status
+git add .
+git commit -m "DB changes"
+git status
+git push -u origin main
+git status
+git diff
+git status
+git add .
+git commit -m "Fixed Errors"
+git push -u origin main

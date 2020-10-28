@@ -72,10 +72,13 @@ public class CustomerInfo extends AppCompatActivity {
         userId = Objects.requireNonNull(fAuth.getCurrentUser()).getUid();
         user = fAuth.getCurrentUser();
 
+        //if user not verified the email
         if(!user.isEmailVerified()){
+            //show verify Mesaage and resendcode
             verifyMsg.setVisibility(View.VISIBLE);
             resendCode.setVisibility(View.VISIBLE);
 
+            //if user click resendcode
             resendCode.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(final View v) {
@@ -95,6 +98,7 @@ public class CustomerInfo extends AppCompatActivity {
             });
         }
 
+        //get profile data from firebase
         DatabaseReference ref = database.getReference("users/"+userId +"/profile");
 
         ref.addValueEventListener(new ValueEventListener() {
@@ -103,6 +107,8 @@ public class CustomerInfo extends AppCompatActivity {
                 // Post post = dataSnapshot.getValue(Post.class);
                 if(dataSnapshot.exists()){
                     Profile prof = dataSnapshot.getValue(Profile.class);
+
+                    //set that data to relvant ui elements
                     phone.setText(prof.getPhone());
                     fullName.setText(prof.getfName());
                     email.setText(prof.getEmail());
@@ -132,17 +138,22 @@ public class CustomerInfo extends AppCompatActivity {
 
     }
 
+    //if user click save buttone
     public void Save(View view) {
 
+        //if fullname , email , phone is empty
         if(fullName.getText().toString().isEmpty() || email.getText().toString().isEmpty() || phone.getText().toString().isEmpty()){
+            //display error message
             CustomMessage.displayStatusMessage("FullName, Email , Phone Number Fields are required",3,3,CustomerInfo.this);
             return;
         }
 
+        //if email has changed
         final String email_ = email.getText().toString();
         user.updateEmail(email_).addOnSuccessListener(new OnSuccessListener<Void>() {
             @Override
             public void onSuccess(Void aVoid) {
+                //update the data with firebase database
                 DatabaseReference ref = database.getReference("users/"+user.getUid());
                 //DocumentReference docRef = fStore.collection("users").document(user.getUid());
 
@@ -165,18 +176,20 @@ public class CustomerInfo extends AppCompatActivity {
                     }
                 });
 
-
+                //display success message
                 Toast.makeText(CustomerInfo.this, "Email is changed.", Toast.LENGTH_SHORT).show();
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception e) {
+                //display error message
                 Toast.makeText(CustomerInfo.this,   e.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
 
     }
 
+    //if user clicks cancel button
     public void Cancel(View view) {
         startActivity(new Intent(getApplicationContext(),MainActivity.class));
         finish();

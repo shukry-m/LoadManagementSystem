@@ -42,6 +42,7 @@ public class Category2Activity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        ///set ui
         setContentView(R.layout.activity_category2);
 
 
@@ -50,8 +51,8 @@ public class Category2Activity extends AppCompatActivity {
         userId = (fAuth.getCurrentUser()!= null)? fAuth.getCurrentUser().getUid():"0";
         mDatabase = FirebaseDatabase.getInstance().getReference();
 
-        //top_bar =  findViewById(R.id.tb_category2);
-        //Getting the ToggleButton and Button instance from the layout xml file
+        //map ui elements to these variables
+        // so we can access the data which user has inserted
         Blender_Switch= findViewById(R.id.Blender_Switch);
         RiceCooker_Switch= findViewById(R.id.RiceCooker_Switch);
         HotPlate_Switch= findViewById(R.id.HotPlate_Switch);
@@ -64,22 +65,26 @@ public class Category2Activity extends AppCompatActivity {
         buttonSubmit= findViewById(R.id.btn_save);
         progressBar = findViewById(R.id.progressBar);
 
-
+        //get All data from this app's (local) database and Set those values to relevent ToggleButtons
         setData();
 
+        //click submit button
         addListenerOnButtonClick();
 
     }
 
     private void addListenerOnButtonClick() {
 
+        //click submit button
         buttonSubmit.setOnClickListener(new View.OnClickListener(){
 
             @Override
             public void onClick(View view) {
 
+                //show progress bar
                 progressBar.setVisibility(View.VISIBLE);
 
+                //insert All ui elements to the list
                 ArrayList<Category2HomeAppliance> list= new ArrayList<>();
                 list.add(new Category2HomeAppliance("C2_1",userId,"Blender", Blender_Switch.getText().toString()));
                 list.add(new Category2HomeAppliance("C2_2",userId,"Rice Cooker", RiceCooker_Switch.getText().toString()));
@@ -91,33 +96,47 @@ public class Category2Activity extends AppCompatActivity {
                 list.add(new Category2HomeAppliance("C2_8",userId,"Hand Mixture", HandMixture_switch.getText().toString()));
                 list.add(new Category2HomeAppliance("C2_9",userId,"Sandwich Toaster", SandwichToaster_switch.getText().toString()));
 
-
+                //insert all datas to app's local database
                 final int count = new Category2HomeApplianceDAO(Category2Activity.this).insert(list);
 
 
+                //insert all categories to firebase database
                 new FirebaseDAO(Category2Activity.this).insertCategory2(list);
 
-                new FirebaseDAO(Category2Activity.this).getCategory("category2");
-
+                //iterate the list
                 for(Category2HomeAppliance  category2 : list){
-                    ArrayList<ManualControl> AllCategoryList = new ManualControlDAO(Category2Activity.this).getAllCategory(category2.getC2_ID(),userId);
+
+                    //get All categories from manual control database
+                    ArrayList<ManualControl> AllManualCategoryList = new ManualControlDAO(Category2Activity.this).getAllCategory(category2.getC2_ID(),userId);
+
+                    //if category status is yes
                     if(category2.getC2_STATUS().equalsIgnoreCase("yes")){
 
+                        //insert manualcontrol
                         new ManualControlDAO(Category2Activity.this).insert(category2.getC2_ID(),userId,category2.getC2_LABEL());
+                        //insert Schedule cooking
                         new ScheduleManualCookingDAO(Category2Activity.this).insert(category2.getC2_ID(),userId,category2.getC2_LABEL());
                     }else{
-                        //remove all categories
-                        if(AllCategoryList.size()>0) {
+                        //if category status is no; delete all manualcontrol and schedule manual data
+
+                        //delete all data from manual control
+                        if(AllManualCategoryList.size()>0) {
+                            //delete from app's local database
                             new ManualControlDAO(Category2Activity.this).deleteAllCategory(category2.getC2_ID(), userId);
-                            for(ManualControl m : AllCategoryList){
+
+                            //delete manaual control from firebase
+                            for(ManualControl m : AllManualCategoryList){
                                 String path = "users/" + userId + "/manualControl";
                                 new FirebaseDAO(Category2Activity.this).deleteFromFirebase(path,m.getM_ID());
                             }
                         }
+                        //get Manual Schedule Cooking with that label name
                         ScheduleManual scheduleManual = new ScheduleManualCookingDAO(Category2Activity.this).getFromLabel(userId,category2.getC2_LABEL());
                         if(scheduleManual != null){
-                            //delete from local db
+                            //delete from app's local db
                             new ScheduleManualCookingDAO(Category2Activity.this).delete(userId,category2.getC2_LABEL());
+
+                            //delete from firebase
                             String path = "users/" + userId + "/ScheduleCooking";
                             new FirebaseDAO(Category2Activity.this).deleteFromFirebase(path,scheduleManual.getS_ID()+"");
                         }
@@ -125,11 +144,18 @@ public class Category2Activity extends AppCompatActivity {
                     }
                 }
 
-                //timout
+                //wait for 6 seconds
                 new Handler().postDelayed(new Runnable() {
                     public void run() {
+
+                        //after 6 seconds
+                        //hide progressbar
                         progressBar.setVisibility(View.GONE);
+
+                        //display success message
                         Toast.makeText(Category2Activity.this,count+ " Records Inserted ",Toast.LENGTH_LONG).show();
+
+                        //naviate to HomeAppliace Activity
                         startActivity(new Intent(getApplicationContext(),HomeApplianceActivity.class));
                     }
                 }, 6600);
@@ -142,7 +168,7 @@ public class Category2Activity extends AppCompatActivity {
     }
 
 
-
+    //get All data from this app's (local) database and Set those values to relevent ToggleButtons
     private void setData() {
         userId = (fAuth.getCurrentUser()!= null)? fAuth.getCurrentUser().getUid():"0";
         list = new Category2HomeApplianceDAO(Category2Activity.this).getAll(userId);
@@ -191,16 +217,17 @@ public class Category2Activity extends AppCompatActivity {
             }
         }
     }
-
+    // enable "set Data" functionality that needs to run while the component is visible and in the foreground
     @Override
     protected void onResume() {
         super.onResume();
         setData();
 
     }
-
+    //if use press back
     @Override
     public void onBackPressed() {
+        //navigate to HomeAppliance Activity
         Intent intent = new Intent(getApplicationContext(), HomeApplianceActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         startActivity(intent);

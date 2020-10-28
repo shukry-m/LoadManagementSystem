@@ -47,7 +47,6 @@ public class MainActivity extends AppCompatActivity {
     AccountHeader headerResult = null;
     public static final String TAG = "TAG";
     FirebaseAuth fAuth;
-    //FirebaseFirestore fStore;
     String userID;
     LinearLayout progressBar;
 
@@ -55,71 +54,54 @@ public class MainActivity extends AppCompatActivity {
     private DatabaseReference mDatabase;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        //set ui
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        //map ui elements to these variables
+        // so we can access the data which user has inserted
         mToolBar =  findViewById( R.id.tb_main );
         progressBar =  findViewById( R.id.progressBar );
-
-        fAuth = FirebaseAuth.getInstance();
-        //fStore = FirebaseFirestore.getInstance();
-        userID = (fAuth.getCurrentUser()!= null)? fAuth.getCurrentUser().getUid():"0";
-        mDatabase = FirebaseDatabase.getInstance().getReference();
         rvMenuItem = (RecyclerView) findViewById( R.id.rvMenuItem );
-        //layoutManager = new LinearLayoutManager(this);
+
+        //initialize firebase database
+        fAuth = FirebaseAuth.getInstance();
+
+        //get userId from database
+        //if userId is not available assign the value to zero
+        userID = (fAuth.getCurrentUser()!= null)? fAuth.getCurrentUser().getUid():"0";
+
+        //initialize firebase database
+        mDatabase = FirebaseDatabase.getInstance().getReference();
+
+        //Divide the page to two columns
         LinearLayoutManager layoutManager = new GridLayoutManager( MainActivity.this, 2, RecyclerView.VERTICAL, false );
         rvMenuItem.setLayoutManager( layoutManager );
         rvMenuItem.setHasFixedSize( true );
-        String[] menuLabels = {"Appliance", "Manual Control", "ScheduleActivity", "Cost & Power","Customer Info"};
+
+
+        //insert drawer then user can click logout button
         insertNavigationDrawer( savedInstanceState );
 
-        int[] menuImages = {
-                R.drawable.setting,
-                R.drawable.control,
-                R.drawable.schedule,
-                R.drawable.cost_power,
-                R.drawable.customer_info,
 
-        };
-        ArrayList<MyMenu> arrayList = new ArrayList<>();
+       //insert menus and images to the menulist
+        ArrayList<MyMenu> menuList = new ArrayList<>();
+        menuList.add(new MyMenu("Appliance",R.drawable.setting));
+        menuList.add(new MyMenu("Manual Control",R.drawable.control));
+        menuList.add(new MyMenu("ScheduleActivity",R.drawable.schedule));
+        menuList.add(new MyMenu("Cost & Power",R.drawable.cost_power));
+        menuList.add(new MyMenu("Customer Info",R.drawable.customer_info));
 
-        for (int i = 0; i < menuLabels.length; i++) {
-            String menuName = menuLabels[i];
-            int img = menuImages[i];
-            arrayList.add( new MyMenu( menuName, img ) );
-        }
-        adapter = new MenuAdapter( getApplicationContext(), arrayList );
+       //initialize adapter
+        adapter = new MenuAdapter( getApplicationContext(), menuList );
+
+        //set that list to recycle view
         rvMenuItem.setAdapter( adapter );
-
-
-      //  downloadFromFirebase();
-
-
     }
 
-    void downloadFromFirebase(){
-
-        progressBar.setVisibility(View.VISIBLE);
-        new FirebaseDAO(MainActivity.this).getCategory("category1");
-        new FirebaseDAO(MainActivity.this).getCategory("category2");
-        new FirebaseDAO(MainActivity.this).getCategory("category3");
-       // new FirebaseDAO(MainActivity.this).getManualControl();
-       // new FirebaseDAO(MainActivity.this).getAutomaicSchedule();
-
-        new Handler().postDelayed(new Runnable() {
-            public void run() {
-                progressBar.setVisibility(View.GONE);
-            }
-        }, 6600);
-      //  new ManualControlDAO(MainActivity.this).insertNewLabel(userID);
-
-    }
-    @Override
-    protected void onResume() {
-        super.onResume();
-       // downloadFromFirebase();
-    }
-
+  //create drawer in left side
     private void insertNavigationDrawer(Bundle savedInstanceState) {
+        //build left side drawer
         headerResult = new AccountHeaderBuilder()
                 .withActivity( this )
                 .withHeaderBackground( R.drawable.dr_back )
@@ -146,6 +128,8 @@ public class MainActivity extends AppCompatActivity {
         drawerBuilder.withSelectedItem(0);
         drawerBuilder.withTranslucentStatusBar(false);
         drawerBuilder.withAccountHeader(headerResult);
+
+        //set Lables inside the drawer with images
         drawerBuilder.addDrawerItems(
                 new PrimaryDrawerItem().withName("Home").withIcon(R.drawable.ic_home_black).withIdentifier(1).withSelectedColor(3),
                 new PrimaryDrawerItem().withName("Appliance").withIcon(R.drawable.setting).withIdentifier(5).withBadgeStyle(new BadgeStyle(Color.RED, Color.RED)),
@@ -154,76 +138,71 @@ public class MainActivity extends AppCompatActivity {
                 new SecondaryDrawerItem().withName("About Us").withIcon(R.drawable.ic_about_us).withTag("Bullhorn"),
                 new SecondaryDrawerItem().withName("Logout").withIcon(R.drawable.ic_exit)
         );
+
+        //when we click drawer bar item
         drawerBuilder.withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
             @Override
             public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
 
 
+                //if user click home from drawer
                 if (((Nameable) drawerItem).getName().getText(MainActivity.this).equals("Home")) {
+                    //navigate to home page
                     Intent intent = new Intent(getApplicationContext(), MainActivity.class);
                     intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     startActivity(intent);
+
+                    //close this activity
                     finish();
                 }
 
+                //if user click Appliance from drawer
                 if (((Nameable) drawerItem).getName().getText(MainActivity.this).equals("Appliance")) {
-                    //Sync Activity
+                    //navigate to homeAppliance page
                     Intent intent = new Intent(getApplicationContext(), HomeApplianceActivity.class);
                     intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     startActivity(intent);
+
+                    //close this activity
                     finish();
 
                 }
-
+                //if user click logout from drawer
                 if (((Nameable) drawerItem).getName().getText(MainActivity.this).equals("Logout")) {
-                    displayStatusMessage("Are you sure want to  exit?",3,0);
+
+                    //ask logout confirmation message
+                    //if yes it will close this app
+                    displayStatusMessage("Are you sure want to  exit?");
 
                 }
 
                 return false;
             }
         });
-        result = drawerBuilder.build();//set the AccountHeader  created earlier for the header
+        //create drawer
+        result = drawerBuilder.build();
     }
 
+    //when user click back button ,
     @Override
     public void onBackPressed() {
 
-
-        displayStatusMessage("Are you sure want to  exit?",3,0);
+        //ask logout confirmation message
+        //if yes it will close this app
+        displayStatusMessage("Are you sure want to  exit?");
 
     }
 
-    private void displayStatusMessage(String s, int colorValue, final int id) {
+    //Ask confirmation message
+    private void displayStatusMessage(String s) {
 
         AlertDialog.Builder builder = null;
         View view = null;
         TextView tvOk, tvMessage,tvCancel;
         ImageView imageView;
-        int defaultColor = R.color.textGray;
-        int successColor = R.color.successColor; // 1
-        int errorColor = R.color.errorColor; // 2
-        int warningColor = R.color.warningColor; // 3
 
-        int success = R.drawable.ic_success;
-        int error_image = R.drawable.ic_error;
-        int warning_image = R.drawable.ic_warning;
-        //1,2,3
-
-        int color = defaultColor;
-        int img = success;
-        if (colorValue == 1) {
-            color = successColor;
-            img = success;
-
-        } else if (colorValue == 2) {
-            color = errorColor;
-            img = error_image;
-
-        } else if (colorValue == 3) {
-            color = warningColor;
-            img = warning_image;
-        }
+        int color =  R.color.warningColor;
+        int img = R.drawable.ic_warning;
 
         builder = new AlertDialog.Builder(MainActivity.this);
         view = getLayoutInflater().inflate(R.layout.layout_for_custom_message, null);
@@ -237,33 +216,42 @@ public class MainActivity extends AppCompatActivity {
         tvMessage.setText(s);
         imageView.setImageResource(img);
 
-
+        //set those variables in layout_for_custom_message layout
         builder.setView(view);
+
+        //create the builder
         final AlertDialog alertDialog = builder.create();
+
+        //show alertDialog
         alertDialog.show();
         tvCancel.setVisibility(View.VISIBLE);
+
+        //if user clicks ok for logout
         tvOk.setOnClickListener(    new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (id==0){
-                   // System.exit(0);
-                   // finish();
-                    alertDialog.dismiss();
 
-                        FirebaseAuth.getInstance().signOut();//logout
-                        startActivity(new Intent(getApplicationContext(),LoginActivity.class));
-                        finish();
+                //dismiss the alertDialog
+                alertDialog.dismiss();
 
-                }else{
-                    alertDialog.dismiss();
-                }
+                //signout from firebase
+                FirebaseAuth.getInstance().signOut();//logout
+
+                //navigate to login page
+                startActivity(new Intent(getApplicationContext(),LoginActivity.class));
+
+                //close this activity
+                finish();
 
 
             }
         });
+
+        //if user click cancel for logout
         tvCancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                //dismiss the alert box
                 alertDialog.dismiss();
             }
         });

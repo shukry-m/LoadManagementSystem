@@ -35,12 +35,14 @@ public class MenuAdapter extends RecyclerView.Adapter<MenuAdapter.MenuAdapterVie
         this.arrayList = arrayList;
     }
 
+    //get a Menu object and attach  it to layout_for_menu ui
     @Override
     public MenuAdapter.MenuAdapterViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from( parent.getContext() ).inflate( R.layout.layout_for_menu, parent, false );
         return new MenuAdapterViewHolder( view );
     }
 
+    //get the menu object and set texts and images
     @Override
     public void onBindViewHolder(MenuAdapter.MenuAdapterViewHolder holder, final int position) {
         {
@@ -57,38 +59,42 @@ public class MenuAdapter extends RecyclerView.Adapter<MenuAdapter.MenuAdapterVie
                     .error( android.R.drawable.stat_notify_error )
                     .into( holder.ivMenuImage );
 
+            //set navigation to those images
             holder.ivMenuImage.setOnClickListener( new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
 
                     switch (menuLabel) {
-
+                            //if user clicks Appliance then navigate to Appliance Activity
                         case "Appliance":
                             Intent oIntent = new Intent( context, HomeApplianceActivity.class );
                             oIntent.setFlags( Intent.FLAG_ACTIVITY_NEW_TASK );
                             context.startActivity( oIntent );
                             break;
+                        //if user clicks Manual Control then navigate to Manual Control Activity
                         case "Manual Control":
                             Intent aIntent = new Intent( context, ManualControlActivity.class );
                             aIntent.setFlags( Intent.FLAG_ACTIVITY_NEW_TASK );
                             context.startActivity( aIntent );
                             break;
+                        //if user clicks ScheduleActivity then navigate to ScheduleActivity
                         case "ScheduleActivity":
                             Intent hIntent = new Intent( context, ScheduleActivity.class );
                             hIntent.setFlags( Intent.FLAG_ACTIVITY_NEW_TASK );
                             context.startActivity( hIntent );
                             break;
+                        //if user clicks Cost & Power then navigate to Cost And Power Activity
                         case "Cost & Power":
                             Intent cIntent = new Intent( context, CostAndPower.class );
                             cIntent.setFlags( Intent.FLAG_ACTIVITY_NEW_TASK );
                             context.startActivity( cIntent );
                             break;
-
-                            case "Customer Info":
+                        //if user clicks Customer Info then navigate to Cost And Power Activity
+                        case "Customer Info":
                             Intent adIntent = new Intent( context, CustomerInfo.class );
                             adIntent.setFlags( Intent.FLAG_ACTIVITY_NEW_TASK );
                             context.startActivity( adIntent );
-                            break;
+                        break;
                         default:
                             if (!checkNetworkConnection()) {
                                 Toast.makeText( context, "Please Check your Network Connection...", Toast.LENGTH_LONG ).show();
@@ -101,6 +107,7 @@ public class MenuAdapter extends RecyclerView.Adapter<MenuAdapter.MenuAdapterVie
         }
     }
 
+    //display how many number of items in recycle view
     @Override
     public int getItemCount() {
         if (arrayList != null) {

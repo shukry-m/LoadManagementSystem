@@ -59,64 +59,79 @@ public class ScheduleManualCookingActivity extends AppCompatActivity  {
         setContentView(R.layout.activity_schedule_manual_category3);
         rvSHItems = findViewById(R.id.rvMCItems);
         fAuth = FirebaseAuth.getInstance();
-        userID = (fAuth.getCurrentUser() != null) ? fAuth.getCurrentUser().getUid() : "0";
+
         btn_save = findViewById(R.id.btn_save);
 
         progressBar = findViewById(R.id.progressBar);
         NoData = findViewById(R.id.NoData);
         header = findViewById(R.id.header);
 
+        //get userId from firebase database
+        userID = (fAuth.getCurrentUser() != null) ? fAuth.getCurrentUser().getUid() : "0";
         downloadData();
 
 
+
         if (list.size() == 0) {
+            //if there is no result then display  Nodata message and hide table header
             NoData.setVisibility(View.VISIBLE);
             header.setVisibility(View.GONE);
         } else {
+            //if there is  result then hide  Nodata message and show table header
             NoData.setVisibility(View.GONE);
             header.setVisibility(View.VISIBLE);
         }
 
 
+        //intialize adapter for recycleview
         adapter = new ScheduleManualAdapter(ScheduleManualCookingActivity.this, list,new ClickListener() {
 
             @Override
             public void onPositionClicked(int position, View view) {
 
+                //get clicked Schedule manual
                 final ScheduleManual mn = list.get(position);
 
+                //if user clicked endtime
                 if(view.getId() == R.id.endTime) {
                     final TextView tex = view.findViewById(R.id.endTime);
                     TimePickerDialog.OnTimeSetListener listener = new TimePickerDialog.OnTimeSetListener() {
                         @Override
                         public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
 
+                            //set hours and minutes to schedule manual
                             mn.setS_End_Time_Hour(getTwoValue(hourOfDay));
                             mn.setS_End_Time_Minute(getTwoValue(minute));
 
+                            //set time on text
                             tex.setText(getTwoValue(hourOfDay) + ":" + getTwoValue(minute));
                         }
                     };
                     DialogFragment newFragment = new TimePickerFragment(listener);
                     newFragment.show(getSupportFragmentManager(), "timePicker");
+                    //insert data into the list
                     dbList.put(mn.getS_ID(),mn);
 
                 }
+                //if user clicked starttime
                 if(view.getId() == R.id.starttime) {
                     final TextView tex = view.findViewById(R.id.starttime);
                     TimePickerDialog.OnTimeSetListener listener = new TimePickerDialog.OnTimeSetListener() {
                         @Override
                         public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
 
+                            //set hours and minutes to schedule manual
                             mn.setS_Start_Time_Hour(getTwoValue(hourOfDay));
                             mn.setS_Start_Time_Minute(getTwoValue(minute));
 
+                            //set time on text
                             tex.setText(getTwoValue(hourOfDay) + ":" + getTwoValue(minute));
                         }
 
                     };
                     DialogFragment newFragment = new TimePickerFragment(listener);
                     newFragment.show(getSupportFragmentManager(), "timePicker");
+                    //insert data into the list
                     dbList.put(mn.getS_ID(),mn);
                 }
             }
@@ -142,13 +157,13 @@ public class ScheduleManualCookingActivity extends AppCompatActivity  {
 
 
 
-
+        //if user click save button
         btn_save.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
 
-
+            //show progress bar
                 progressBar.setVisibility(View.VISIBLE);
 
                 int count = 0;
@@ -158,22 +173,29 @@ public class ScheduleManualCookingActivity extends AppCompatActivity  {
                     ScheduleManual scheduleManual = entry.getValue();
 
                     scheduleManual.setS_USER_ID(userID);
+                    //insert data into app's local database
                     count += new ScheduleManualCookingDAO(ScheduleManualCookingActivity.this).insert(scheduleManual);
 
                 }
+                //get all data from schedule manual
                 ArrayList<ScheduleManual> allData = new ScheduleManualCookingDAO(ScheduleManualCookingActivity.this).getAll(userID);
 
                 new FirebaseDAO(ScheduleManualCookingActivity.this).insertScheduleCooking(allData);
 
+                //iterate all data for calculate cost value
                 for(ScheduleManual scheduleManual:allData){
 
+                    //if schedule is oven
                     if(scheduleManual.getS_LABEL().equalsIgnoreCase("oven")) {
 
+                        //get calculation hour
                         double val = Calculation(scheduleManual.getS_LABEL(),scheduleManual.getS_Start_Time_Hour()+":"+scheduleManual.getS_Start_Time_Minute(),scheduleManual.getS_End_Time_Hour()+":"+scheduleManual.getS_End_Time_Minute());
                         System.out.println(val/60.0);
 
+                        //get the relevent list's price value
                         BigDecimal b = new BigDecimal(StartTimeList.get(scheduleManual.getS_LABEL()));
 
+                        //round
                         b= b.setScale(2, BigDecimal.ROUND_HALF_EVEN).abs();
 
                         System.out.println(StartTimeList.put(scheduleManual.getS_LABEL(),b.doubleValue()));
@@ -181,13 +203,20 @@ public class ScheduleManualCookingActivity extends AppCompatActivity  {
                 }
 
 
+                //after 4 second
                 final int finalCount = count;
                 new Handler().postDelayed(new Runnable() {
                     public void run() {
+                        //hide progressbar
                         progressBar.setVisibility(View.GONE);
+
+                        //if the price value is not null
                         if(StartTimeList.get("Oven")!= null) {
+
+                            //display the mesage
                             displayStatusMessage(" Power usage status for  \n" + "Oven : Rs." + StartTimeList.get("Oven"), ScheduleManualCookingActivity.this);
                         }else{
+                            //display success messgae
                              Toast.makeText(ScheduleManualCookingActivity.this, finalCount + " Records Inserted ", Toast.LENGTH_LONG).show();
 
                              startActivity(new Intent(getApplicationContext(), ScheduleManualActivity.class));
@@ -201,9 +230,8 @@ public class ScheduleManualCookingActivity extends AppCompatActivity  {
         });
 
     }
-//time1_calender , time2_calender are changing
 
-
+//get All hour costs
     private double getAllUsedHoursCost(int wat,String start_time,String end_time,String label){
         double CostCount1 = (getUsedhour("05:30","18:30",start_time,end_time,label));// * 23)/1000;
         double CostCount2 = (getUsedhour("18:30","22:30",start_time,end_time,label));// * 54)/1000;
@@ -212,6 +240,7 @@ public class ScheduleManualCookingActivity extends AppCompatActivity  {
         return (CostCount1+CostCount2+CostCount3+CostCount4);//wat * (CostCount1+CostCount2+CostCount3+CostCount4);
     }
 
+    //get used hour for particular start time and end time
     private double getUsedhour(String t1,String t2,String start,String end,String label){
         double used_hour = 0;
         try {
@@ -243,15 +272,14 @@ public class ScheduleManualCookingActivity extends AppCompatActivity  {
             Date end_ = end_calendar.getTime();
             Date time2_ = time2_calendar.getTime();
             Date time1_ = time1_calendar.getTime();
+
             if (start_.after(time1_calendar.getTime()) && start_.before(time2_calendar.getTime()) || start_.equals(time1_calendar.getTime())) {
-                //checkes whether the current time is between string1 and string2.
+                //checkes whether the current time is between time1 and time2.
                 System.out.println(true);
 
                 if(end_.before(time2_calendar.getTime()) || end_.equals(time2_calendar.getTime())){
 
-                    /* BigDecimal b = new BigDecimal(StartTimeList.get(scheduleManual.getS_LABEL()));
-
-                        b= b.setScale(2, BigDecimal.ROUND_HALF_EVEN);*/
+                    //calculate values
                     double cal_hour = (end_.getTime() - start_.getTime()) / (60000);
                      used_hour += (end_.getTime() - start_.getTime()) / (60000); //* 23
                      System.out.println(used_hour);
@@ -494,6 +522,7 @@ public class ScheduleManualCookingActivity extends AppCompatActivity  {
         return cost;
     }
 
+    //getnerate two integer values id clock return one
     private String getTwoValue(int hourOfDay) {
         if((hourOfDay+"").length()==1){
             return "0"+hourOfDay;
@@ -502,6 +531,7 @@ public class ScheduleManualCookingActivity extends AppCompatActivity  {
         }
     }
 
+    //download data from firebase and insert to list
     void downloadData() {
         new FirebaseDAO(ScheduleManualCookingActivity.this).getScheduleCooking();
         list = new ScheduleManualCookingDAO(ScheduleManualCookingActivity.this).getAll(userID);

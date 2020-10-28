@@ -64,9 +64,11 @@ public class ScheduleAutomaticActivity extends AppCompatActivity {
 
 
 
+        //if list has no items display noData messge
         if(list.size() == 0){
             NoData.setVisibility(View.VISIBLE);
         }else{
+            //if list has  items hide noData messge
             NoData.setVisibility(View.GONE);
         }
 
@@ -81,6 +83,7 @@ public class ScheduleAutomaticActivity extends AppCompatActivity {
         System.out.println(Automatic_Switch.getText().toString());
 
 
+        //user click Set automatic schedule button
         Automatic_Switch.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -95,11 +98,16 @@ public class ScheduleAutomaticActivity extends AppCompatActivity {
         });
 
 
+        //user click save button
         btn_save.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                //show progress bar
                 progressBar.setVisibility(View.VISIBLE);
+
                 AllStatus allStatus = new AllStatus(userID,"automaticSchedule");
+
+                //if Automatic schedule button is on set status to 1
                 if(Automatic_Switch.getText().toString().equalsIgnoreCase("on")){
                    allStatus.setALL_STATUS("1");
                 }else{
@@ -109,20 +117,26 @@ public class ScheduleAutomaticActivity extends AppCompatActivity {
                 allStatus.setALL_ID(1);
                 sum = SaveData("1" , dbList);
 
+                //insert status
                 new AllStatusDAO(ScheduleAutomaticActivity.this).insert(allStatus);
 
+                //get all Automatic schedule
                 ArrayList<AutomaticSchedule> allData = new AutomaticScheduleDAO(ScheduleAutomaticActivity.this).getAll(userID);
                 AllStatus allSt = new AllStatusDAO(ScheduleAutomaticActivity.this).get("automaticSchedule",userID);
 
+                //insert into firebase
                 new FirebaseDAO(ScheduleAutomaticActivity.this).insertAutomaticScheduleStatus(allSt);
                 new FirebaseDAO(ScheduleAutomaticActivity.this).insertAutomaicSchedule(allData);
 
 
+                //wait for 4 seconds
                 new Handler().postDelayed(new Runnable() {
                     public void run() {
+                        //hide progress bar
                         progressBar.setVisibility(View.GONE);
+                        //show success messgae
                         Toast.makeText(ScheduleAutomaticActivity.this, sum + " Records Inserted ", Toast.LENGTH_LONG).show();
-                        //displayStatusMessage("Records Successfully inserted",getApplicationContext());
+                        //navigate to schedule
                         startActivity(new Intent(getApplicationContext(), ScheduleActivity.class));
                     }
                 }, 4600);
@@ -134,6 +148,7 @@ public class ScheduleAutomaticActivity extends AppCompatActivity {
 
     }
 
+    //insert Data into app's local database
     public int SaveData(final String status , HashMap<Integer, AutomaticSchedule> dbList){
         int count = 0;
 
@@ -152,6 +167,7 @@ public class ScheduleAutomaticActivity extends AppCompatActivity {
         return  count;
     }
 
+    //initialize adpater for recycleview
     private void ChangeAdapter( final HashMap<Integer, AutomaticSchedule> dbList) {
         adapter =  new ScheduleAutomaticAdapter(ScheduleAutomaticActivity.this,userID,list,new ClickListener(){
 
@@ -186,6 +202,7 @@ public class ScheduleAutomaticActivity extends AppCompatActivity {
         adapter.notifyDataSetChanged();
     }
 
+    //download all data from firebase and insert into list
     void downloadData(){
         new FirebaseDAO(ScheduleAutomaticActivity.this).getAutomaicSchedule();
         new FirebaseDAO(ScheduleAutomaticActivity.this).getAutomaticScheduleStatus();
@@ -203,6 +220,7 @@ public class ScheduleAutomaticActivity extends AppCompatActivity {
         }
     }
 
+    //if user press back
     @Override
     public void onBackPressed() {
         Intent intent = new Intent(getApplicationContext(), ScheduleActivity.class);

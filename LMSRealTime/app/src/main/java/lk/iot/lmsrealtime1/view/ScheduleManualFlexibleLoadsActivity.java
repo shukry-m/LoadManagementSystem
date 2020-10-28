@@ -77,22 +77,26 @@ public class ScheduleManualFlexibleLoadsActivity extends AppCompatActivity {
             NoData.setVisibility(View.GONE);
             header.setVisibility(View.VISIBLE);
         }
-
+    //intialize adapter for recycleview
         adapter = new ScheduleManualAdapter(ScheduleManualFlexibleLoadsActivity.this, list,new ClickListener() {
 
             @Override
             public void onPositionClicked(int position, View view) {
 
+                //get clicked Schedule manual
                 final ScheduleManual mn = list.get(position);
 
+                ///if user clicked endtime
                 if(view.getId() == R.id.endTime) {
                     final TextView tex = view.findViewById(R.id.endTime);
                     TimePickerDialog.OnTimeSetListener listener = new TimePickerDialog.OnTimeSetListener() {
                         @Override
                         public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+                            //set hours and minutes to schedule manual
                             mn.setS_End_Time_Hour(getTwoValue(hourOfDay));
                             mn.setS_End_Time_Minute(getTwoValue(minute));
 
+                            //set time on text
                             tex.setText(getTwoValue(hourOfDay) + ":" + getTwoValue(minute));
                         }
                     };
@@ -100,6 +104,7 @@ public class ScheduleManualFlexibleLoadsActivity extends AppCompatActivity {
                     newFragment.show(getSupportFragmentManager(), "timePicker");
                     dbList.put(mn.getS_ID(),mn);
                 }
+                //if user clicked starttime
                 if(view.getId() == R.id.starttime) {
                     final TextView tex = view.findViewById(R.id.starttime);
                     TimePickerDialog.OnTimeSetListener listener = new TimePickerDialog.OnTimeSetListener() {
@@ -108,12 +113,14 @@ public class ScheduleManualFlexibleLoadsActivity extends AppCompatActivity {
                             mn.setS_Start_Time_Hour(getTwoValue(hourOfDay));
                             mn.setS_Start_Time_Minute(getTwoValue(minute));
 
+                            //set time on text
                             tex.setText(getTwoValue(hourOfDay) + ":" + getTwoValue(minute));
                         }
 
                     };
                     DialogFragment newFragment = new TimePickerFragment(listener);
                     newFragment.show(getSupportFragmentManager(), "timePicker");
+                    //insert data into the list
                     dbList.put(mn.getS_ID(),mn);
                 }
             }
@@ -137,10 +144,12 @@ public class ScheduleManualFlexibleLoadsActivity extends AppCompatActivity {
         rvSHItems.setAdapter(adapter);
 
 
+        //if user click save button
         btn_save.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
+                //show progress bar
                 progressBar.setVisibility(View.VISIBLE);
 
                 int count = 0;
@@ -150,19 +159,25 @@ public class ScheduleManualFlexibleLoadsActivity extends AppCompatActivity {
                     ScheduleManual scheduleManual = entry.getValue();
 
                     scheduleManual.setS_USER_ID(userID);
+                    //insert data into app's local database
                     count += new ScheduleManualFlexibleLoadsDAO(ScheduleManualFlexibleLoadsActivity.this).insert(scheduleManual);
 
                 }
+                //get all data from schedule manual
                 ArrayList<ScheduleManual> allData = new ScheduleManualFlexibleLoadsDAO(ScheduleManualFlexibleLoadsActivity.this).getAll(userID);
 
                 new FirebaseDAO(ScheduleManualFlexibleLoadsActivity.this).insertScheduleFlexibleLoads(allData);
 
+                //iterate all data for calculate cost value
                 for(ScheduleManual scheduleManual:allData){
+                    //if schedule is washing machine or water pump
                     if(scheduleManual.getS_LABEL().equalsIgnoreCase("washing machine") || scheduleManual.getS_LABEL().equalsIgnoreCase("water pump")) {
 
+                        //get calculation hour
                         double val = Calculation(scheduleManual.getS_LABEL(),scheduleManual.getS_Start_Time_Hour()+":"+scheduleManual.getS_Start_Time_Minute(),scheduleManual.getS_End_Time_Hour()+":"+scheduleManual.getS_End_Time_Minute());
                         System.out.println(val/60.0);
 
+                        //get the relevent list's price value
                         BigDecimal b = new BigDecimal(StartTimeList.get(scheduleManual.getS_LABEL()));
 
                         b= b.setScale(2, BigDecimal.ROUND_HALF_EVEN);
@@ -170,6 +185,7 @@ public class ScheduleManualFlexibleLoadsActivity extends AppCompatActivity {
                         System.out.println(StartTimeList.put(scheduleManual.getS_LABEL(),b.doubleValue()));
                     }
                 }
+                //create message
                 int num = 0;
                 String message = " Power usage status for ";
                 if(StartTimeList.get("Water Pump") != null){
@@ -184,12 +200,16 @@ public class ScheduleManualFlexibleLoadsActivity extends AppCompatActivity {
                 final int finalCount = count;
                 final String finalMessage = message;
                 final int finalNum = num;
+                //after  seconds
                 new Handler().postDelayed(new Runnable() {
                     public void run() {
+                        //hide progressbar
                         progressBar.setVisibility(View.GONE);
+                        //if there is cost value
                         if(finalNum >0) {
                             displayStatusMessage(finalMessage, ScheduleManualFlexibleLoadsActivity.this);
                         }else{
+                            //display success messgae
                             Toast.makeText(ScheduleManualFlexibleLoadsActivity.this, finalCount + " Records Inserted ", Toast.LENGTH_LONG).show();
 
                             startActivity(new Intent(getApplicationContext(), ScheduleManualActivity.class));
@@ -203,7 +223,7 @@ public class ScheduleManualFlexibleLoadsActivity extends AppCompatActivity {
 
     }
 
-
+    //getnerate two integer values id clock return one
     private String getTwoValue(int hourOfDay) {
         if((hourOfDay+"").length()==1){
             return "0"+hourOfDay;
@@ -212,12 +232,14 @@ public class ScheduleManualFlexibleLoadsActivity extends AppCompatActivity {
         }
     }
 
+    //download data from firebase and insert to list
     void downloadData() {
         new FirebaseDAO(ScheduleManualFlexibleLoadsActivity.this).getScheduleFlexibleLoads();
         list = new ScheduleManualFlexibleLoadsDAO(ScheduleManualFlexibleLoadsActivity.this).getAll(userID);
 
     }
 
+    //if user press back
     @Override
     public void onBackPressed() {
         Intent intent = new Intent(getApplicationContext(), ScheduleManualActivity.class);
